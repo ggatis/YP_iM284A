@@ -1,0 +1,92 @@
+/**
+ * @file    WiMOD_DemoApp.h
+ *
+ * @brief   Declaration of class WiMOD_DemoApp
+ *
+ * @note    This example code is free software: you can redistribute it and/or modify it.
+ *
+ *          This program is provided by IMST GmbH on an "AS IS" basis without
+ *          any warranties in the hope that it will be useful.
+ */
+
+#ifndef __WiMOD_DemoApp_H__
+#define __WiMOD_DemoApp_H__
+
+#include "Utils/Console.h"
+#include "RadioHub/RadioHub.h"
+
+//<! example application which demonstrates the message exchange with WiMOD radio modules provided by IMST.
+class WiMOD_DemoApp : public Console::KeyEventHandler
+                    , public RadioHub::Client
+{
+public:
+                                WiMOD_DemoApp( Console& console );
+
+    //<! enable application
+    void                        Enable( const QString& portName );
+
+private:
+
+    //<! callback for keyboard inputevents
+    void                        OnKeyEvent( int keyCode ) override;
+
+    //<! special key coded
+    enum KeyCodes
+    {
+        Key_Escape  =   27,
+        Key_Space   =   32
+    };
+
+private:
+
+    //<! commands related to this application
+    void                        OnExit();
+    void                        OnShowMenu();
+
+    //<! commands for DeviceManagement messages
+    void                        OnPingDevice();
+    void                        OnGetDeviceInfo();
+    void                        OnGetFirmwareVersion();
+    void                        OnGetDeviceInformation();
+    void                        OnGetDateTime();
+    void                        OnSetDateTime();
+    void                        OnRestartDevice();
+
+    //<! callback for incoming radio data eventa
+    void                        OnRadioHub_DataEvent( const QJsonObject& result ) override;
+
+private:
+
+    //<! console for keyboard input and simple character output
+    Console&                    _Console;
+
+    //<! RadioHub for communication with radio modules
+    RadioHub                    _RadioHub;
+
+    //<! name of used serial port
+    QString                     _PortName;
+
+    //<! prototype for menu handler
+    typedef void (WiMOD_DemoApp::*FuncPtr)();
+
+    //<! menu item
+    struct MenuItem
+    {
+        //<! key code
+        int                     KeyCode;
+
+        //<! text for key
+        const char*             KeyText;
+
+        //<! text for menu item
+        const char*             Text;
+
+        //<! handler for menu action
+        FuncPtr                 Handler;
+    };
+
+    //<! main menu
+    static const MenuItem       _MainMenu[];
+};
+
+#endif // __WiMOD_DemoApp_H__

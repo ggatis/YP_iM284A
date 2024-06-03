@@ -1,0 +1,179 @@
+/**
+ * @file    WiMOD_DemoApp.cpp
+ *
+ * @brief   Implementation of class WiMOD_DemoApp
+ *
+ * @note    This example code is free software: you can redistribute it and/or modify it.
+ *
+ *          This program is provided by IMST GmbH on an "AS IS" basis without
+ *          any warranties in the hope that it will be useful.
+ */
+
+#include "WiMOD_DemoApp.h"
+#include "Utils/Console.h"
+
+#include <QCoreApplication>
+
+//<! table with main menu
+const WiMOD_DemoApp::MenuItem
+WiMOD_DemoApp::_MainMenu[] =
+{
+    { '1',          "1",        "ping target device",       &WiMOD_DemoApp::OnPingDevice },
+    { '2',          "2",        "get device information",   &WiMOD_DemoApp::OnGetDeviceInformation },
+    { '3',          "3",        "get firmware version",     &WiMOD_DemoApp::OnGetFirmwareVersion },
+    { '4',          "4",        "get date and time",        &WiMOD_DemoApp::OnGetDateTime },
+    { '5',          "5",        "set date and time",        &WiMOD_DemoApp::OnSetDateTime },
+    { '6',          "6",        "restart target device",    &WiMOD_DemoApp::OnRestartDevice },
+    { Key_Space,    "SPACE",    "show this menu",           &WiMOD_DemoApp::OnShowMenu },
+    { Key_Escape,   "Escape",   "exit application",         &WiMOD_DemoApp::OnExit }
+};
+
+/**
+ * @brief   class constructor of main application
+ * @param   console     reference to a console
+ */
+WiMOD_DemoApp::WiMOD_DemoApp( Console& console )
+             : _Console( console )
+             , _RadioHub( *this )
+             , _PortName( "none" )
+{
+}
+
+/**
+ * @brief   enable application
+ * @param   portName        name of serial port, e.g.: "ttyUSB", "COM1"
+ */
+void
+WiMOD_DemoApp::Enable( const QString& portName )
+{
+    _PortName = portName;
+
+    _Console.ClearScreen();
+    _Console.Print( "This application demonstrates the host controller message protocol for WiMOD radio modules provided by IMST.\n" );
+    _Console.Print( "Please connect a WiMOD module or WiMOD concentrator.\n" );
+    _Console.Print( "Don't forget to install the required USB to UART Bridge driver.\n\n" );
+
+    // register for keyboared input events
+    _Console.RegisterKeyEventHandler( this );
+
+    _RadioHub.Enable( portName );
+
+    OnShowMenu();
+}
+
+/**
+ * @brief handle keyboard events from console
+ *
+ * @param keyCode
+ */
+void
+WiMOD_DemoApp::OnKeyEvent( int keyCode )
+{
+    for ( int i = 0; i < (int)( sizeof( _MainMenu ) / sizeof( MenuItem ) ); i++ )
+    {
+        const MenuItem* item = &_MainMenu[ i ];
+
+        if ( ( item->Handler != nullptr ) && ( item->KeyCode == keyCode ) )
+        {
+            _Console.Print( "" );
+            _Console.Print( "Command", item->Text );
+
+            FuncPtr handler = item->Handler;
+
+            // call handler
+            (this->*handler)();
+
+            break;
+        }
+    }
+}
+
+/**
+ * @brief   show the main menu
+ */
+void
+WiMOD_DemoApp::OnShowMenu()
+{
+    _Console.Print( "Used Port", _PortName );
+
+    _Console.Print( "" );
+    _Console.Print( "" );
+    _Console.Print( "Select a command", ">\n" );
+
+    for ( int i = 0; i < (int)( sizeof( _MainMenu ) / sizeof( MenuItem ) ); i++ )
+    {
+        const MenuItem* item = &_MainMenu[ i ];
+
+        _Console.Print( item->KeyText, item->Text );
+    }
+}
+
+/**
+ *  @brief  some command handler
+ */
+void
+WiMOD_DemoApp::OnExit()
+{
+    _Console.Print( "\ngoodbye!\n" );
+    QCoreApplication::quit();
+}
+
+void
+WiMOD_DemoApp::OnPingDevice()
+{
+    _RadioHub.GetDeviceManagement().OnPingDevice();
+}
+
+void
+WiMOD_DemoApp::OnGetDeviceInformation()
+{
+    _RadioHub.GetDeviceManagement().OnGetDeviceInfo();
+}
+
+void
+WiMOD_DemoApp::OnGetFirmwareVersion()
+{
+    _RadioHub.GetDeviceManagement().OnGetFirmwareVersion();
+}
+
+void
+WiMOD_DemoApp::OnGetDateTime()
+{
+    _RadioHub.GetDeviceManagement().OnGetDateTime();
+}
+
+void
+WiMOD_DemoApp::OnSetDateTime()
+{
+    _RadioHub.GetDeviceManagement().OnSetDateTime();
+}
+
+void
+WiMOD_DemoApp::OnRestartDevice()
+{
+    _RadioHub.GetDeviceManagement().OnRestartDevice();
+}
+
+/**
+ * @brief   print results for incoming radio events and response
+ * @param   result      decoded data from radio module in Json format
+ */
+void
+WiMOD_DemoApp::OnRadioHub_DataEvent( const QJsonObject& result )
+{
+    QJsonObject data = result;
+
+    // print results in a certain order
+    QStringList order; order << "Event" << "Status";
+
+    for ( const QString& key : order )
+    {
+        if ( data.contains( key ) )
+        {
+            _Console.Print( key, data.value( key ).toString() );
+            data.remove( key );
+        }
+    }
+    _Console.PrintResults( data );
+    _Console.PrintLine();
+}

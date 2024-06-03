@@ -1,0 +1,7 @@
+sliplib==0.6.2
+pyserial==3.4
+crccheck==1.0
+
+# packaging
+build==0.7.0
+setuptools==58.1.0
