@@ -165,37 +165,40 @@ SerialMessage::GetPayload( int index, int size ) const
     return QByteArray();
 }
 
-QString
+std::string
 SerialMessage::GetString( int index , int size ) const
 {
-    return QString( GetPayload( index, size ) );
+    return std::string( GetPayload( index, size ) );
 }
 
-QString
-SerialMessage::GetHexString( int index , int size ) const
-{
-    QByteArray rawData = GetPayload( index, size );
 
-    QString result;
-    for( int i = 0; i < rawData.size(); i++ )
-    {
-        result.append( QString( "%1" ).arg( (uint8_t)rawData.at( i ), 2, 16, QLatin1Char( '0' ) ).toUpper() );
+std::string
+SerialMessage::GetHexString( int index , int size ) const {
+
+    ByteArray rawData = GetPayload( index, size );
+
+    std::string result;
+    for( int i = 0; i < rawData.size(); i++ ) {
+
+        result.append( std::string( "%1" ).arg( (uint8_t)rawData.at( i ), 2, 16, QLatin1Char( '0' ) ).toUpper() );
         result.append( "-" );
+    
     }
     result.chop( 1 );
 
     return result;
 }
 
-QString
+
+std::string
 SerialMessage::GetHexString_LSB( int index , int size ) const
 {
     QByteArray rawData = GetPayload( index, size );
 
-    QString result;
+    std::string result;
     for( int i = rawData.size() - 1; i >= 0; i-- )
     {
-        result.append( QString( "%1" ).arg( (uint8_t)rawData.at( i ), 2, 16, QLatin1Char( '0' ) ).toUpper() );
+        result.append( std::string( "%1" ).arg( (uint8_t)rawData.at( i ), 2, 16, QLatin1Char( '0' ) ).toUpper() );
         result.append( "-" );
     }
     result.chop( 1 );
@@ -203,8 +206,8 @@ SerialMessage::GetHexString_LSB( int index , int size ) const
     return result;
 }
 
-QString
-SerialMessage::GetDateTime(int index , const QString& formatString) const
+std::string
+SerialMessage::GetDateTime(int index , const std::string& formatString) const
 {
     uint32_t seconds = GetU32( index );
 
@@ -279,7 +282,7 @@ SerialMessage::Append( uint64_t value )
 }
 
 int
-SerialMessage::AppendHexString( const QString& input )
+SerialMessage::AppendHexString( const std::string& input )
 {
     QByteArray payload = input.toUtf8().replace( '-', "" );
 
@@ -295,7 +298,7 @@ SerialMessage::AppendHexString( const QString& input )
 }
 
 int
-SerialMessage::AppendHexString_LSB( const QString& input )
+SerialMessage::AppendHexString_LSB( const std::string& input )
 {
     QByteArray payload = input.toUtf8().replace( '-', "" );
 
@@ -312,8 +315,7 @@ SerialMessage::AppendHexString_LSB( const QString& input )
 }
 
 int
-SerialMessage::Append_CRC16()
-{
+SerialMessage::Append_CRC16() {
     CRC16   crc16;
 
     // get reference to base class

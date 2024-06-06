@@ -14,7 +14,7 @@
 
 #include "SerialMessage.h"
 
-//#include "ServiceAccessPoints/DeviceManagement/DeviceManagement.h"
+#include "DeviceManagement.h"
 //#include "ServiceAccessPoints/LoRaMeshRouter/LoRaMeshRouter.h"
 //#include "ServiceAccessPoints/Trace/Trace.h"
 
@@ -37,7 +37,7 @@ public:
     class Client {
     public:
         //<! callback interface for decoded data
-        virtual void    OnRadioHub_DataEvent( const Dictionary& /* result */ ){}
+        virtual void    OnRadioHub_DataEvent( const Dictionary& /* result */ ) {}
     };
 
 private:
@@ -45,13 +45,13 @@ private:
     RadioHub::Client&   _Client;
 
     //<! DeviceManagement Service Access Point
-    //DeviceManagement    _DeviceMgmt;
+//    DeviceManagement    _DeviceMgmt;
 
     //<! LoRaMeshRouter Service Access Point
-    //LoRaMeshRouter      _LoRaMeshRouter;
+//    LoRaMeshRouter      _LoRaMeshRouter;
 
     //<! Trace Service Access Point
-    //Trace               _Trace;
+//    Trace               _Trace;
 
     //<! SlipDecoder for incoming messages
     SlipDecoder         _SlipDecoder;

@@ -22,8 +22,8 @@
  */
 
 LoRaMesh_DemoApp::LoRaMesh_DemoApp( HardwareSerial& RadioSerial, USBSerial& HMISerial ) :
-    _RadioHub               ( *this, RadioSerial ),
-    //QString                 _PortName;
+    RadioHub            ( *this, RadioSerial ),
+    //QString             _PortName;
     _HMISerial          ( HMISerial ),
     _Network_ID         ( (char*)"00-2A" ),
     _DeviceEUI_Node_A   ( (char*)"01-aa-aa-aa-02-aa-aa-aa" ),
@@ -243,7 +243,7 @@ LoRaMesh_DemoApp::OnRadioHub_DataEvent( const Dictionary& result ) {
     const char* keys[] = { key0, key1 };
 
 #if 1
-
+    //A
     Dictionary  data = result;
 
     for ( uint8_t i = 0; i < ( sizeof( keys ) / sizeof( keys[0] ) ); i++ ) {
@@ -262,7 +262,7 @@ LoRaMesh_DemoApp::OnRadioHub_DataEvent( const Dictionary& result ) {
     _HMISerial.println();
 
 #else
-
+    //B
     result.print( _HMISerial, keys, ( sizeof( keys ) / sizeof( keys[0] ) ) );
     result.print( _HMISerial, keys, ( sizeof( keys ) / sizeof( keys[0] ) ), true );
 

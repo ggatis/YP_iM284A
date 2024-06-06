@@ -81,7 +81,8 @@ ByteArray::~ByteArray( void ) {
  *
  * @return  ByteArray data buffer
  */
-uint8_t*    ByteArray::data( void ) const {
+uint8_t*
+ByteArray::data( void ) const {
     return _data;
 }
 
@@ -92,7 +93,8 @@ uint8_t*    ByteArray::data( void ) const {
  *
  * @return  ByteArray data size
  */
-uint16_t    ByteArray::count( void ) const {
+uint16_t
+ByteArray::count( void ) const {
     return _count;
 }
 
@@ -103,7 +105,8 @@ uint16_t    ByteArray::count( void ) const {
  *
  * @return  ByteArray array size
  */
-uint16_t    ByteArray::size( void ) const {
+uint16_t
+ByteArray::size( void ) const {
     return _size;
 }
 
@@ -114,7 +117,8 @@ uint16_t    ByteArray::size( void ) const {
  *
  * @return  -
  */
-void        ByteArray::clear( void ) {
+void
+ByteArray::clear( void ) {
     _count = 0;
 }
 
@@ -125,7 +129,8 @@ void        ByteArray::clear( void ) {
  *
  * @return  correctly updated count of the data size in arrray
  */
-uint16_t    ByteArray::update_count( uint16_t newcount ) {
+uint16_t
+ByteArray::update_count( uint16_t newcount ) {
     _count = ( newcount > _size ) ? _size : newcount;
     return _count;
 }
@@ -137,9 +142,25 @@ uint16_t    ByteArray::update_count( uint16_t newcount ) {
  *
  * @return  byte at position index
  */
-uint8_t     ByteArray::at( uint16_t index ) const {
+uint8_t
+ByteArray::at( uint16_t index ) const {
     //if ( index < _count )
     if ( index < _size )
+        return _data[index];
+    return 0;
+}
+
+/**
+ * @brief   return byte at index
+ *
+ * @param   index  array index
+ *
+ * @return  byte at position index
+ */
+uint8_t
+ByteArray::at( int index ) const {
+    //if ( index < _count )
+    if ( index < (int)_size )
         return _data[index];
     return 0;
 }
@@ -151,13 +172,32 @@ uint8_t     ByteArray::at( uint16_t index ) const {
  *
  * @return  byte count in array or 0 if array is full
  */
-uint16_t    ByteArray::append( uint8_t abyte ) {
+ByteArray
+ByteArray::append( uint8_t abyte ) {
     if ( _count < _size ) {
         _data[_count++] = abyte;
-        return _count;
     }
-    return 0;
+    return *this;
 }
+
+
+/**
+ * @brief   returns byte count in array
+ *
+ * @param   repeats byte repeats
+ *          byte    byte to append
+ *
+ * @return  byte count in array
+ */
+ByteArray
+ByteArray::append( int repeats, uint8_t abyte ) {
+    int i = repeats;
+    while ( ( 0 < i-- ) && ( _count < _size ) ) {
+        _data[_count++] = abyte;
+    }
+    return *this;
+}
+
 
 /**
  * @brief   return ByteArray converted form HEX
@@ -167,7 +207,8 @@ uint16_t    ByteArray::append( uint8_t abyte ) {
  * @return  ByteArray converted form HEX
  */
 ByteArray
-ByteArray::fromHex( const ByteArray &hexEncoded ) const {
+ByteArray::fromHex( const ByteArray &hexEncoded ) {
+
     ByteArray tfromHex( ( hexEncoded._count >> 1 ) + ( hexEncoded._count & 1 ) );
 
     for ( uint16_t i = 0; i < tfromHex._count; i++ ) {

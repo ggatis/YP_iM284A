@@ -125,13 +125,32 @@ class ByteArray {
         uint8_t     at( uint16_t index ) const;
 
         /**
+         * @brief   return byte at index
+         *
+         * @param   index  array index
+         *
+         * @return  byte at position index
+         */
+        uint8_t     at( int index ) const;
+
+        /**
          * @brief   returns byte count in array
          *
          * @param   byte  byte to append
          *
          * @return  byte count in array
          */
-        uint16_t     append( uint8_t byte );
+        ByteArray   append( uint8_t abyte );
+
+        /**
+         * @brief   returns byte count in array
+         *
+         * @param   repeats byte repeats
+         *          byte    byte to append
+         *
+         * @return  byte count in array
+         */
+        ByteArray   append( int repeats, uint8_t abyte );
 
         /**
          * @brief   return ByteArray converted form HEX
@@ -140,7 +159,7 @@ class ByteArray {
          *
          * @return  ByteArray converted form HEX
          */
-        ByteArray   fromHex( const ByteArray &hexEncoded ) const;
+        ByteArray   fromHex( const ByteArray &hexEncoded );
 
     private:
         //<! size

@@ -12,8 +12,8 @@
  * Gatis Gaigals @ EDI, 2024 
  */
 
-#ifndef __Slip_Decoder_H__
-#define __Slip_Decoder_H__
+#ifndef _Slip_Decoder_H_
+#define _Slip_Decoder_H_
 
 #include "ByteArray.h"
 
@@ -57,6 +57,26 @@ public:
      */
     void        Decode( ByteArray& output, const ByteArray& input );
 
+    /**
+     * @brief   decode a byte from the encoded SLIP stream
+     *
+     * @param   output      decoded frame
+     * @param   input       a byte from the encoded SLIP byte stream
+     *
+     * @note    on signal "OnFrameReady" the decoded SLIP frame is ready the output array
+     */
+    void        Decode( ByteArray& output, int input );
+
+    /**
+     * @brief   decode an encoded SLIP stream using flagged callback
+     *
+     * @param   output          decoded frame
+     * @param   flByteStream    function returning a byte/-1 from the encoded SLIP byte stream
+     *
+     * @note    on signal "OnFrameReady" the decoded SLIP frame is ready the output array
+     */
+    void        Decode( ByteArray& output, int (*const flByteStream)( void ) );
+
 private:
 
     /**
@@ -88,4 +108,4 @@ private:
     DecoderState            _State;
 };
 
-#endif // __Slip_Decoder_H__
+#endif // _Slip_Decoder_H_

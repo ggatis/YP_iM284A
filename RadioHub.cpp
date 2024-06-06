@@ -20,9 +20,9 @@
 RadioHub::RadioHub( RadioHub::Client& client, HardwareSerial& RadioSerial )
         : _Client           ( client )
         , _RadioSerial      ( RadioSerial )
-        , _DeviceMgmt       ( RadioSerial )
-        , _LoRaMeshRouter   ( RadioSerial )
-        , _Trace            ( RadioSerial )
+//        , _DeviceMgmt       ( RadioSerial )
+//        , _LoRaMeshRouter   ( RadioSerial )
+//        , _Trace            ( RadioSerial )
         , _SlipDecoder      ( this ) {
 
     //connect to serial port for ready read events
@@ -31,41 +31,30 @@ RadioHub::RadioHub( RadioHub::Client& client, HardwareSerial& RadioSerial )
 }
 
 /**
- * @brief   enable RadioHub for communication with connected radio module
+ * @brief   initializes the RadioHub for communication with connected radio module
  *
- * @param   portName    name of serial port, e.g.: "ttyUSB", "COM5"
+ * @param   -
  *
  * @return  true/false
  */
 bool
-RadioHub::Enable( const QString& portName )
-{
-    // open serial port
-    if ( _Port.isOpen() == true )
-        return false;
+RadioHub::Init( void ) {
+    //IMHO should check if module is attached!!!
 
-    // reset SLIP decoder
-    _SlipDecoder.Reset();
+    _RadioSerial.end();
+    _RadioSerial.begin( 115200, SERIAL_8N1 );
+    //_Port.setFlowControl( QSerialPort::NoFlowControl );
 
-    // clear serial message buffer
+    _SerialInfo.append("Port", "Serial1");
+    _SerialInfo.append("Baudrate", "115200 bps");
+    _SerialInfo.append("Config", "SERIAL_8N1");
+    _SerialInfo.append("Manufacturer", "STM");
+
+    //clear serial message buffer
     _RxMessage.clear();
 
-    // configure port name
-    _Port.setPortName( portName );
-
-    // open port for read and write access
-    if ( _Port.open( QIODevice::ReadWrite ) == false )
-        return false;
-
-    _Port.setBaudRate( QSerialPort::Baud115200 );
-    _Port.setDataBits( QSerialPort::Data8 );
-    _Port.setStopBits( QSerialPort::OneStop );
-    _Port.setParity( QSerialPort::NoParity );
-    _Port.setFlowControl( QSerialPort::NoFlowControl );
-
-    _SerialInfo[ "Port" ]         = "Serial1";
-    _SerialInfo[ "Baudrate" ]     = "115200 bps";
-    _SerialInfo[ "Manufacturer" ] = "STM";
+    //reset SLIP decoder
+    _SlipDecoder.Reset();
 
     return true;
 }
@@ -82,16 +71,19 @@ RadioHub::GetSerial( void ) {
  * @brief   process available bytes from serial port
  */
 void
-RadioHub::OnSerialPort_ReadyRead()
-{
-    // get number of received bytes
-    quint64 numBytes =  _Port.bytesAvailable();
+RadioHub::OnSerialPort_ReadyRead( void ) {
 
-    if ( numBytes > 0 )
-    {
-        // pass incoming byte stream to SLIP decoder
-        _SlipDecoder.Decode( _RxMessage, _Port.readAll() );
+#if 1
+    //A
+    while ( 0 < _RadioSerial.available() ) {
+        //pass incoming byte stream to SLIP decoder
+        //_SlipDecoder.Decode( _RxMessage, _Port.readAll() );
+        _SlipDecoder.Decode( _RxMessage, _RadioSerial.read() );
     }
+#else
+    //B
+    _SlipDecoder.Decode( _RxMessage, _RadioSerial.read );
+#endif
 }
 
 /**
@@ -100,15 +92,17 @@ RadioHub::OnSerialPort_ReadyRead()
 void
 RadioHub::OnSlipDecoder_MessageReady( const ByteArray& msg ) {
 
-    // HCI message is available in _RxMessage, we can ignore incoming param "msg" here
-    _RxMessage.print( SerialUSB );
+    //HCI message is available in _RxMessage, we can ignore incoming param "msg" here
+    //since it points to the same _RxMessage
+    SerialUSB.print( _RxMessage.GetHexString() );
 
     Dictionary result;
 
     // pass message to message decoder and convert message content into human readable JsonObject
-//    if ( ServiceAccessPoint::OnDispatchMessage( _RxMessage, result ) )
-//    {
+    if ( ServiceAccessPoint::OnDispatchMessage( _RxMessage, result ) ) {
         _Client.OnRadioHub_DataEvent( result );
-//    }
+    } else {
+        SerialUSB.print("No dispachers for: " + _RxMessage.GetHexString() );
+    }
 
 }

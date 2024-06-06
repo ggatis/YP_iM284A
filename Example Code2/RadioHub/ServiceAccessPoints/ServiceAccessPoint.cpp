@@ -101,7 +101,9 @@ ServiceAccessPoint::SendMessage( SerialMessage& serialMsg )
     // prepend wakeup chars
     if ( _NumWakeupChars > 0 )
     {
-        outputData.append( outputData.append( _NumWakeupChars, SlipEncoder::Begin ) );
+        outputData.append(
+                outputData.append( _NumWakeupChars, SlipEncoder::Begin )
+            );
     }
 
     SlipEncoder::Encode( outputData, serialMsg );
