@@ -16,6 +16,7 @@
 
 #include <cstdint>
 #include <map>
+#include <initializer_list> //initializer_list support
 
 template <typename Key, typename T>
 
@@ -25,6 +26,9 @@ private:
     std::map<Key, T> data;
 
 public:
+    //constructor to initialize the map with an initializer list
+    aMap( std::initializer_list<std::pair<const Key, T>> initList ) : data( initList ) {}
+
     //insert a key-value pair
     void insert( const Key& key, const T& value ) {
         data[key] = value;

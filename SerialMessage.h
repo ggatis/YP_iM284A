@@ -166,14 +166,14 @@ public:
      *
      * @param   index   index to array
      */
-    std::string GetHexString( int index, int size = -1 ) const;
+    std::string GetHexString( int index = 0, int size = -1 ) const;
 
     /**
      * @return  hexadecimal formated string with LSB first order
      *
      * @param   index   index to array
      */
-    std::string GetHexString_LSB( int index, int size = -1 ) const;
+    std::string GetHexString_LSB( int index = 0, int size = -1 ) const;
 
     /**
      * @return  seconds since epoch as human readable date time string

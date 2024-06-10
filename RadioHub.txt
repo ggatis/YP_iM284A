@@ -1,0 +1,14 @@
+class RadioHub : public SlipDecoder::Client {
+
+public:
+    class Client {
+    public:
+        //<! callback interface for decoded data
+        virtual void    OnRadioHub_DataEvent( const Dictionary& /* result */ ) {}
+    };
+
+private:
+    //<! reference to client
+    RadioHub::Client&   _Client;
+
+};

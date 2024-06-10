@@ -10,6 +10,7 @@
  */
 
 #include "RadioHub.h"
+#include "printSTDstring.h"
 //#include <QSerialPortInfo>
 
 /**
@@ -94,15 +95,16 @@ RadioHub::OnSlipDecoder_MessageReady( const ByteArray& msg ) {
 
     //HCI message is available in _RxMessage, we can ignore incoming param "msg" here
     //since it points to the same _RxMessage
-    SerialUSB.print( _RxMessage.GetHexString() );
+    printSTDstring( _RxMessage.GetHexString() );
 
     Dictionary result;
 
-    // pass message to message decoder and convert message content into human readable JsonObject
+    //pass message to message decoder and convert message content into human readable JsonObject
     if ( ServiceAccessPoint::OnDispatchMessage( _RxMessage, result ) ) {
         _Client.OnRadioHub_DataEvent( result );
     } else {
-        SerialUSB.print("No dispachers for: " + _RxMessage.GetHexString() );
+        printSTDstring("No dispachers for: ");
+        printSTDstring( _RxMessage.GetHexString() );
     }
 
 }

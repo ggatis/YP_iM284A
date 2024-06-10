@@ -14,6 +14,7 @@
 #ifndef _ByteArray_H_
 #define _ByteArray_H_
 
+#include <string>
 #include <stdint.h>
 
 /**
@@ -63,11 +64,47 @@ class ByteArray {
                     ByteArray( uint16_t repeats, char c );
 
         /**
+          * @brief  class constructor from string
+          *
+          * @param  aString
+         */
+                    ByteArray( const std::string& aString );
+
+        /**
+          * @brief  class copy constructor, initialised using const ByteArray,
+          *         _size is reduced to _count
+          *
+          * @param  aByteArray   input ByteArray
+          */
+                    ByteArray( const ByteArray& other );
+
+        /**
+          * @brief  move constructor
+          *
+          * @param  ByteArray& aByteArray
+          */
+                    ByteArray( ByteArray&& other ) noexcept;
+
+        /**
           * @brief  class destructor
           *
           * @param  -
           */
                    ~ByteArray( void );
+
+        /**
+          * @brief  copy assignment operator
+          *
+          * @param  const ByteArray& aByteArray
+          */
+        ByteArray& operator = ( const ByteArray& other );
+
+        /**
+          * @brief  move assignment operator
+          *
+          * @param  ByteArray& aByteArray
+          */
+        ByteArray& operator = ( ByteArray&& other ) noexcept;
 
         /**
          * @brief   returns data buffer
@@ -134,7 +171,7 @@ class ByteArray {
         uint8_t     at( int index ) const;
 
         /**
-         * @brief   returns byte count in array
+         * @brief   incoming ByteArray with added abyte
          *
          * @param   byte  byte to append
          *
@@ -143,7 +180,7 @@ class ByteArray {
         ByteArray   append( uint8_t abyte );
 
         /**
-         * @brief   returns byte count in array
+         * @brief   incoming ByteArray with added abyte x repeats
          *
          * @param   repeats byte repeats
          *          byte    byte to append
@@ -159,7 +196,27 @@ class ByteArray {
          *
          * @return  ByteArray converted form HEX
          */
-        ByteArray   fromHex( const ByteArray &hexEncoded );
+        ByteArray   fromHex( const ByteArray &hexEncoded ) const;
+
+        /**
+         * @brief   returns mid
+         *
+         * @param   uint16_t index
+         *          int size
+         *
+         * @return  ByteArray
+         */
+        ByteArray   mid( uint16_t index, int size ) const;
+
+        /**
+         * @brief   Removes n bytes from the end of the byte array.
+         *          If n is greater than size(), the result is an empty byte array.
+         *
+         * @param   n   bytes to remove rom the end
+         *
+         * @return  ByteArray
+         */
+        ByteArray   chop( int n );
 
     private:
         //<! size

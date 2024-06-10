@@ -141,6 +141,15 @@ class Dictionary {
         uint16_t    append( const uint8_t* akey, const uint8_t* data );
 
         /**
+         * @brief   returns byte count in array
+         *
+         * @param   key and data to append
+         *
+         * @return  byte count in array
+         */
+        uint16_t    append( const uint8_t* akey, std::string& aString );
+
+        /**
          * @brief   finds if the dictionary contains a record with a given key
          *
          * @param   -

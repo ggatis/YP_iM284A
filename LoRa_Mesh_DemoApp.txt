@@ -1,0 +1,10 @@
+class LoRaMesh_DemoApp : public RadioHub {
+
+public:
+                            LoRaMesh_DemoApp        ( HardwareSerial& RadioSerial, USBSerial& HMISerial );
+
+public:
+
+    void                    OnRadioHub_DataEvent    ( const Dictionary& result ) override;
+
+};

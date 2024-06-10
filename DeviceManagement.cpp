@@ -15,7 +15,7 @@
 //#include <QDateTime>
 
 //<! map with status code strings
-const QMap < uint8_t, std::string > DeviceManagement::_StatusCodes =
+const aMap < uint8_t, std::string > DeviceManagement::_StatusCodes =
 {
     { Ok,                       "ok" },
     { Error,                    "error" },
@@ -31,7 +31,7 @@ const QMap < uint8_t, std::string > DeviceManagement::_StatusCodes =
 };
 
 //<! map with module type strings
-const QMap < uint8_t, std::string > DeviceManagement::_ModuleTypes =
+const aMap < uint8_t, std::string > DeviceManagement::_ModuleTypes =
 {
     { 104,  "iM284A-XL" },
     { 109,  "iM891A-XL" },
@@ -40,7 +40,7 @@ const QMap < uint8_t, std::string > DeviceManagement::_ModuleTypes =
 };
 
 //<! map with response & event names for HCI messages
-const QMap < uint8_t , std::string > DeviceManagement::_EventNames =
+const aMap < uint8_t , std::string > DeviceManagement::_EventNames =
 {
     { Startup_Ind,              "startup indication" },
     { Ping_Rsp,                 "ping device response" },
@@ -54,7 +54,7 @@ const QMap < uint8_t , std::string > DeviceManagement::_EventNames =
 };
 
 //<! map with message handlers for HCI messages
-const QMap < uint8_t , DeviceManagement::Handler > DeviceManagement::_Handlers =
+const aMap < uint8_t , DeviceManagement::Handler > DeviceManagement::_Handlers =
 {
     { Startup_Ind,              &DeviceManagement::OnStartupIndication },
     { Ping_Rsp,                 &DeviceManagement::OnDefaultResponse },
@@ -209,7 +209,7 @@ DeviceManagement::OnDecodeMessage( const SerialMessage& serialMsg, Dictionary& r
     }
     //no handler found
     std::string 
-    result.append( "Error", "unsupported MsgID: " + std::string::number( msgID ) + " received");
+    result.append( "Error", "unsupported MsgID: " + std::to_string( msgID ) + " received");
     return true;
 }
 
@@ -299,12 +299,11 @@ DeviceManagement::OnDeviceInfoResponse( const SerialMessage& serialMsg, Dictiona
  */
 
 Dictionary
-DeviceManagement::DecodeDeviceInfo( const SerialMessage& serialMsg, int index ) const
-{
+DeviceManagement::DecodeDeviceInfo( const SerialMessage& serialMsg, int index ) const {
     Dictionary info;
     uint8_t moduleType      =   serialMsg.GetU8( index );
-    info[ "Module Type" ]   =   _ModuleTypes.value( moduleType, "unknown module type:" + std::string::number( moduleType ) );
-    info[ "Module ID" ]     =   std::string::number( serialMsg.GetU32( index + 1 ) );
+    info[ "Module Type" ]   =   _ModuleTypes.value( moduleType, "unknown module type:" + std::to_string( moduleType ) );
+    info[ "Module ID" ]     =   std::to_string( serialMsg.GetU32( index + 1 ) );
     info[ "Product Type" ]  =   serialMsg.GetHexString( index + 5, 4 );
     info[ "Product ID" ]    =   serialMsg.GetHexString( index + 9, 4 );
 
@@ -322,8 +321,7 @@ DeviceManagement::DecodeDeviceInfo( const SerialMessage& serialMsg, int index ) 
  */
 
 bool
-DeviceManagement::OnFirmwareVersionResponse( const SerialMessage& serialMsg, Dictionary& result )
-{
+DeviceManagement::OnFirmwareVersionResponse( const SerialMessage& serialMsg, Dictionary& result ) {
     // check minimum payload length
     if ( serialMsg.GetResponsePayloadLength() < FirmwareInfo_MinSize )
         return false;
@@ -348,11 +346,10 @@ DeviceManagement::OnFirmwareVersionResponse( const SerialMessage& serialMsg, Dic
  */
 
 Dictionary
-DeviceManagement::DecodeFirmwareInfo( const SerialMessage& serialMsg, int index ) const
-{
+DeviceManagement::DecodeFirmwareInfo( const SerialMessage& serialMsg, int index ) const {
     Dictionary info;
-    info[ "Version" ]           =   std::string::number( serialMsg.GetU8( index + 1 ) ) + "." + std::string::number( serialMsg.GetU8( index ) );
-    info[ "Build Count" ]       =   std::string::number( serialMsg.GetU16( index + 2 ) );
+    info[ "Version" ]           =   std::to_string( serialMsg.GetU8( index + 1 ) ) + "." + std::to_string( serialMsg.GetU8( index ) );
+    info[ "Build Count" ]       =   std::to_string( serialMsg.GetU16( index + 2 ) );
     info[ "Build Date" ]        =   std::string( serialMsg.GetPayload( index + 4, 10 ) );
     info[ "Firmware Name" ]     =   std::string( serialMsg.GetPayload( index + 14 ) );
 
@@ -370,22 +367,25 @@ DeviceManagement::DecodeFirmwareInfo( const SerialMessage& serialMsg, int index 
  */
 
 bool
-DeviceManagement::OnDateTimeResponse( const SerialMessage& serialMsg, Dictionary& result )
-{
+DeviceManagement::OnDateTimeResponse( const SerialMessage& serialMsg, Dictionary& result ) {
     // check minimum payload length
     if ( serialMsg.GetResponsePayloadLength() < ( 4 ) )
         return false;
 
     uint8_t status                      =   serialMsg.GetResponseStatus();
-    result[ "Status" ]                  =   _StatusCodes.value( status, "error" );
+    result.append("Status",             _StatusCodes.value( status, "error" ) );
 
-    if ( status == Ok )
-    {
-        Dictionary info;
-        info[ "Seconds since epoch" ]   =   std::string::number( serialMsg.GetU32( SerialMessage::ResponseData_Index ) );
-        info[ "Date Time" ]             =   serialMsg.GetDateTime( SerialMessage::ResponseData_Index, "dd-MM-yyyy hh:mm:ss" );
+    if ( Ok == status ) {
+        //Dictionary info;
+        
+        result.append(
+            "Date Time Info.Seconds since epoch",
+            std::to_string( serialMsg.GetU32( SerialMessage::ResponseData_Index ) ) );
+        result.append(
+            "Date Time Info.Date Time",
+            serialMsg.GetDateTime( SerialMessage::ResponseData_Index, "dd-MM-yyyy hh:mm:ss" ) );
+        //result[ "Date Time Info" ]      =   info;
 
-        result[ "Date Time Info" ]      =   info;
     }
     return true;
 }
@@ -401,8 +401,7 @@ DeviceManagement::OnDateTimeResponse( const SerialMessage& serialMsg, Dictionary
  */
 
 bool
-DeviceManagement::OnSystemOptionsResponse( const SerialMessage& serialMsg, Dictionary& result )
-{
+DeviceManagement::OnSystemOptionsResponse( const SerialMessage& serialMsg, Dictionary& result ) {
     //check minimum payload length sID+mID+CRC16
     if ( serialMsg.GetResponsePayloadLength() < ( 4 ) )
         return false;

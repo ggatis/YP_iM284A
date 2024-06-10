@@ -216,7 +216,8 @@ uint16_t     Dictionary::append( const char* akey, const char* data ) {
   *
   * @return  byte count in array
   */
-uint16_t     Dictionary::append( const uint8_t* akey, const uint8_t* data ) {
+uint16_t
+Dictionary::append( const uint8_t* akey, const uint8_t* data ) {
     _keys++;
     uint8_t*    plimit  = _ByteArray.data() + _ByteArray.size();
     uint8_t*    pactual = _ByteArray.data() + _ByteArray.count();
@@ -230,6 +231,34 @@ uint16_t     Dictionary::append( const uint8_t* akey, const uint8_t* data ) {
     _ByteArray.update_count( (uint16_t)( pactual - _ByteArray.data() ) );
     return (uint16_t)( pactual - _ByteArray.data() );
 }
+
+
+/**
+  * @brief   returns byte count in array
+  *
+  * @param   byte  byte to append
+  *
+  * @return  byte count in array
+  */
+uint16_t
+Dictionary::append( const uint8_t* akey, std::string& aString ) {
+    _keys++;
+    uint8_t*    plimit  = _ByteArray.data() + _ByteArray.size();
+    uint8_t*    pactual = _ByteArray.data() + _ByteArray.count();
+    for ( ; pactual < plimit; ) {
+        if ( 0 == ( *pactual++ = *akey++ ) ) break;
+    }
+    char c;
+    for ( uint16_t i = 0; i < aString.size(); ++i ) {
+        c = aString[i];
+        *pactual++ = c;
+        if ( 0 == c ) break;
+    }
+    if ( c ) *pactual++ = 0;
+    _ByteArray.update_count( (uint16_t)( pactual - _ByteArray.data() ) );
+    return (uint16_t)( pactual - _ByteArray.data() );
+}
+
 
 /**
  * @brief   finds if the dictionary contains a record with a given key

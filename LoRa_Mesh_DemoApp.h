@@ -24,7 +24,7 @@
 //                       , public Console::KeyEventHandler
 //                       , public RadioHub::Client
 //class LoRaMesh_DemoApp : public RadioHub::Client {
-class LoRaMesh_DemoApp : public RadioHub {
+class LoRaMesh_DemoApp : public RadioHub, public RadioHub::Client {
 //class LoRaMesh_DemoApp {
 public:
     //                       LoRaMesh_DemoApp         ( Console& console );
