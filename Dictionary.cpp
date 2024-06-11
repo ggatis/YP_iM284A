@@ -43,15 +43,6 @@ uint16_t scan0FromHere( uint8_t* ptr, uint16_t maxsize ) {
 
 
 /**
-  * @brief  class constructor for empty instance
-  *
-  * @param  -
- */
-Dictionary::Dictionary( void ) :
-    _ByteArray( 256 ), _keys( 0 ) {
-}
-
-/**
   * @brief  class constructor, not initialised buffer
   *
   * @param  buffersize  buffer size
@@ -143,27 +134,6 @@ uint16_t    Dictionary::sizeof_data( uint16_t n ) const {
     return scan0FromHere( pkeyn, dicsize - (uint16_t)( pkeyn - pbegin ) );
 }
 
-/**
-  * @brief   returns byte count in array
-  *
-  * @param   byte  byte to append
-  *
-  * @return  byte count in array
-  */
-uint16_t     Dictionary::append( const char* akey, const uint8_t* data ) {
-    _keys++;
-    uint8_t*    plimit  = _ByteArray.data() + _ByteArray.size();
-    uint8_t*    pactual = _ByteArray.data() + _ByteArray.count();
-    for ( ; pactual < plimit; ) {
-        if ( 0 == ( *pactual++ = (uint8_t)*akey++ ) ) break;
-    }
-    for ( ; pactual < plimit; ) {
-        if ( 0 == ( *pactual++ = *data++ ) ) break;
-    }
-    *--plimit = 0;
-    _ByteArray.update_count( (uint16_t)( pactual - _ByteArray.data() ) );
-    return (uint16_t)( pactual - _ByteArray.data() );
-}
 
 /**
   * @brief   returns byte count in array
@@ -172,20 +142,25 @@ uint16_t     Dictionary::append( const char* akey, const uint8_t* data ) {
   *
   * @return  byte count in array
   */
-uint16_t     Dictionary::append( const char* akey, char* data ) {
+uint16_t
+Dictionary::append( const char* akey, char* data ) {
     _keys++;
     uint8_t*    plimit  = _ByteArray.data() + _ByteArray.size();
     uint8_t*    pactual = _ByteArray.data() + _ByteArray.count();
     for ( ; pactual < plimit; ) {
-        if ( 0 == ( *pactual++ = (uint8_t)*akey++ ) ) break;
+        if ( 0 == ( *pactual++ = (uint8_t)*akey++ ) ) goto skip_endmarking1;
     }
+    *( pactual - 1 ) = 0;
+skip_endmarking1:
     for ( ; pactual < plimit; ) {
-        if ( 0 == ( *pactual++ = (uint8_t)*data++ ) ) break;
+        if ( 0 == ( *pactual++ = (uint8_t)*data++ ) ) goto skip_endmarking2;
     }
-    *--plimit = 0;
+    *( pactual - 1 ) = 0;
+skip_endmarking2:
     _ByteArray.update_count( (uint16_t)( pactual - _ByteArray.data() ) );
-    return (uint16_t)( pactual - _ByteArray.data() );
+    return _ByteArray.count();
 }
+
 
 /**
   * @brief   returns byte count in array
@@ -200,15 +175,19 @@ Dictionary::append( const char* akey, const char* data ) {
     uint8_t*    plimit  = _ByteArray.data() + _ByteArray.size();
     uint8_t*    pactual = _ByteArray.data() + _ByteArray.count();
     for ( ; pactual < plimit; ) {
-        if ( 0 == ( *pactual++ = (uint8_t)*akey++ ) ) break;
+        if ( 0 == ( *pactual++ = (uint8_t)*akey++ ) ) goto skip_endmarking3;
     }
+    *( pactual - 1 ) = 0;
+skip_endmarking3:
     for ( ; pactual < plimit; ) {
-        if ( 0 == ( *pactual++ = (uint8_t)*data++ ) ) break;
+        if ( 0 == ( *pactual++ = (uint8_t)*data++ ) ) goto skip_endmarking4;
     }
-    *--plimit = 0;
+    *( pactual - 1 ) = 0;
+skip_endmarking4:
     _ByteArray.update_count( (uint16_t)( pactual - _ByteArray.data() ) );
-    return (uint16_t)( pactual - _ByteArray.data() );
+    return _ByteArray.count();
 }
+
 
 /**
   * @brief   returns byte count in array
@@ -218,19 +197,71 @@ Dictionary::append( const char* akey, const char* data ) {
   * @return  byte count in array
   */
 uint16_t
-Dictionary::append( const uint8_t* akey, const uint8_t* data ) {
+Dictionary::append( const char* akey, const uint8_t* data ) {
     _keys++;
     uint8_t*    plimit  = _ByteArray.data() + _ByteArray.size();
     uint8_t*    pactual = _ByteArray.data() + _ByteArray.count();
     for ( ; pactual < plimit; ) {
-        if ( 0 == ( *pactual++ = *akey++ ) ) break;
+        if ( 0 == ( *pactual++ = (uint8_t)*akey++ ) ) goto skip_endmarking5;
     }
+    *( pactual - 1 ) = 0;
+skip_endmarking5:
     for ( ; pactual < plimit; ) {
-        if ( 0 == ( *pactual++ = *data++ ) ) break;
+        if ( 0 == ( *pactual++ = (uint8_t)*data++ ) ) goto skip_endmarking6;
     }
-    *--plimit = 0;
+    *( pactual - 1 ) = 0;
+skip_endmarking6:
     _ByteArray.update_count( (uint16_t)( pactual - _ByteArray.data() ) );
-    return (uint16_t)( pactual - _ByteArray.data() );
+    return _ByteArray.count();
+}
+
+
+/**
+  * @brief   returns byte count in array
+  *
+  * @param   byte  byte to append
+  *
+  * @return  byte count in array
+  */
+uint16_t
+Dictionary::append( const char* akey, const uint8_t* data, int size ) {
+    _keys++;
+    uint8_t*    plimit  = _ByteArray.data() + _ByteArray.size();
+    uint8_t*    pactual = _ByteArray.data() + _ByteArray.count();
+
+    if ( pactual < plimit ) {
+        for ( ; pactual < plimit; ) {
+            if ( 0 == ( *pactual++ = (uint8_t)*akey++ ) ) goto skip_endmarking7;
+        }
+        *( pactual - 1 ) = 0;   //ja izmet peec for nosaciijuma
+    }
+skip_endmarking7:
+    if ( size < 0 ) {
+        if ( pactual < plimit ) {
+            for ( ; pactual < plimit; ) {
+                if ( 0 == ( *pactual++ = *data++ ) ) goto skip_endmarking8;
+            }
+            *( pactual - 1 ) = 0;   //ja izmet peec for nosaciijuma
+        }
+skip_endmarking8:
+        ;
+    } else {
+        //constant data size if allowed
+        while ( size-- ) {
+            if ( pactual < plimit ) {
+                *pactual++ = *data++;
+            }
+        }
+        if ( *( pactual - 1 ) ) {
+            if ( pactual < plimit ) {
+                *pactual++ = 0;
+            } else {
+                *( pactual - 1 ) = 0;
+            }
+        }
+    }
+    _ByteArray.update_count( (uint16_t)( pactual - _ByteArray.data() ) );
+    return _ByteArray.count();
 }
 
 
@@ -253,17 +284,27 @@ Dictionary::append( const char* akey, std::string& aString ) {
     uint8_t*    plimit  = _ByteArray.data() + _ByteArray.size();
     uint8_t*    pactual = _ByteArray.data() + _ByteArray.count();
     for ( ; pactual < plimit; ) {
-        if ( 0 == ( *pactual++ = (uint8_t)*akey++ ) ) break;
+        if ( 0 == ( *pactual++ = (uint8_t)*akey++ ) ) goto skip_endmarking9;
     }
+    *( pactual - 1 ) = 0;   //ja izmet peec for nosaciijuma
+skip_endmarking9:
     char c;
     for ( uint16_t i = 0; i < aString.size(); ++i ) {
         c = aString[i];
-        *pactual++ = c;
+        if ( pactual < plimit ) {
+            *pactual++ = c;
+        }
         if ( 0 == c ) break;
     }
-    if ( c ) *pactual++ = 0;
+    if ( *( pactual - 1 ) ) {
+        if ( pactual < plimit ) {
+            *pactual++ = 0;
+        } else {
+            *( pactual - 1 ) = 0;
+        }
+    }
     _ByteArray.update_count( (uint16_t)( pactual - _ByteArray.data() ) );
-    return (uint16_t)( pactual - _ByteArray.data() );
+    return _ByteArray.count();
 }
 
 
@@ -286,17 +327,27 @@ Dictionary::append( const char* akey, std::string&& aString ) {
     uint8_t*    plimit  = _ByteArray.data() + _ByteArray.size();
     uint8_t*    pactual = _ByteArray.data() + _ByteArray.count();
     for ( ; pactual < plimit; ) {
-        if ( 0 == ( *pactual++ = (uint8_t)*akey++ ) ) break;
+        if ( 0 == ( *pactual++ = (uint8_t)*akey++ ) ) goto skip_endmarkingA;
     }
+    *( pactual - 1 ) = 0;   //ja izmet peec for nosaciijuma
+skip_endmarkingA:
     char c;
     for ( uint16_t i = 0; i < aString.size(); ++i ) {
         c = aString[i];
-        *pactual++ = c;
+        if ( pactual < plimit ) {
+            *pactual++ = c;
+        }
         if ( 0 == c ) break;
     }
-    if ( c ) *pactual++ = 0;
+    if ( *( pactual - 1 ) ) {
+        if ( pactual < plimit ) {
+            *pactual++ = 0;
+        } else {
+            *( pactual - 1 ) = 0;
+        }
+    }
     _ByteArray.update_count( (uint16_t)( pactual - _ByteArray.data() ) );
-    return (uint16_t)( pactual - _ByteArray.data() );
+    return _ByteArray.count();
 }
 
 
@@ -307,6 +358,7 @@ Dictionary::append( const char* akey, std::string&& aString ) {
   *
   * @return  byte count in array
   */
+/*
 uint16_t
 Dictionary::append( const uint8_t* akey, std::string& aString ) {
     _keys++;
@@ -325,7 +377,7 @@ Dictionary::append( const uint8_t* akey, std::string& aString ) {
     _ByteArray.update_count( (uint16_t)( pactual - _ByteArray.data() ) );
     return (uint16_t)( pactual - _ByteArray.data() );
 }
-
+*/
 
 /**
  * @brief   
@@ -334,6 +386,7 @@ Dictionary::append( const uint8_t* akey, std::string& aString ) {
  *
  * @return  
  */
+/*
 uint16_t
 Dictionary::append( const char* akey, const Dictionary aDictionary, char delimiter ) {
     uint16_t bytes = _ByteArray.count();
@@ -387,7 +440,40 @@ Dictionary::append( const char* akey, const Dictionary aDictionary, char delimit
     }
     return _ByteArray.count() - bytes;
 }
+*/
 
+/**
+ * @brief   finds if the dictionary contains a record with a given key
+ *
+ * @param   akey    search key
+ *
+ * @return  the pos of the data
+ */
+const uint8_t*
+Dictionary::contains( const char* akey ) const {
+    uint16_t k;
+    const uint8_t* testkey;
+    const uint8_t* keycopy;
+
+    uint16_t sizeofkey = strlen( akey );    //optimizeet!
+    if ( 0 == sizeofkey++ ) return nullptr; //sizeofkey++ include zero in check
+
+    for ( k = 0; k < _keys; k++ ) {
+        testkey = key( k );
+        for ( keycopy = (const uint8_t*)akey; keycopy < (const uint8_t*)( akey + sizeofkey ); ) {
+            if ( *testkey++ != *keycopy++ ) goto try_next;
+        }
+        if ( (uint16_t)( testkey - _ByteArray.data() ) > _ByteArray.size() ) {
+            //key fits, no data due the size shortage
+            return _ByteArray.data() + _ByteArray.size() - 1;
+        } else {
+            return testkey;
+        }
+try_next:
+        ;   //at least an empty statement as a tribute to the God of labels
+    }
+    return nullptr;
+}
 
 /**
  * @brief   finds if the dictionary contains a record with a given key
@@ -396,18 +482,18 @@ Dictionary::append( const char* akey, const Dictionary aDictionary, char delimit
  *
  * @return  the pos of the data
  */
-uint8_t*
+const uint8_t*
 Dictionary::contains( const uint8_t* akey ) const {
     uint16_t k;
-    uint8_t* testkey;
-    uint8_t* keycopy;
+    const uint8_t* testkey;
+    const uint8_t* keycopy;
 
     uint16_t sizeofkey = strlen( (const char*)akey );
     if ( 0 == sizeofkey++ ) return nullptr; //sizeofkey++ include zero in check
 
     for ( k = 0; k < _keys; k++ ) {
         testkey = key( k );
-        for ( keycopy = (uint8_t*)akey; keycopy < (uint8_t*)( akey + sizeofkey ); ) {
+        for ( keycopy = akey; keycopy < ( akey + sizeofkey ); ) {
             if ( *testkey++ != *keycopy++ ) goto try_next;
         }
         if ( (uint16_t)( testkey - _ByteArray.data() ) > _ByteArray.size() ) {
@@ -428,22 +514,23 @@ try_next:
  *
  * @return  the size of the deleted record
  */
-uint16_t    Dictionary::remove( const uint8_t* akey ) {
+uint16_t
+Dictionary::remove( const uint8_t* akey ) {
     uint16_t deleted = 0;
 
     const uint16_t sizeofkey = strlen( (const char*)akey );
     if ( 0 == sizeofkey ) return deleted;
 
-    uint8_t* ptrdata = contains( akey );
+    const uint8_t* ptrdata = contains( akey );
     if ( ptrdata ) {
         //Houston we have data!
         //outer frame
         uint8_t* MrFirst = _ByteArray.data();
-        uint8_t* MrLast  = _ByteArray.data() + _ByteArray.count();    //actually next to last
+        uint8_t* MrLast  = _ByteArray.data() + _ByteArray.count();  //actually next to last
         //inner frame
-        uint8_t* first = ptrdata - sizeofkey - 1;   //minus zero sugar
-        const uint16_t sizeofdata = strlen( (const char*)ptrdata );
-        uint8_t* last  = ptrdata + sizeofdata + 1;  //next to zero sugar
+        uint8_t* first = const_cast<uint8_t*>( ptrdata - 1 - sizeofkey );   //minus zero sugar
+        const uint16_t sizeofdata = strlen( (const char*)ptrdata ); //optimizeet!
+        uint8_t* last  = const_cast<uint8_t*>( ptrdata + sizeofdata + 1 );  //next to zero sugar
         if ( last > MrLast ) {
             last = MrLast;
         }

@@ -28,18 +28,11 @@ class Dictionary {
     public:
 
         /**
-          * @brief  class constructor for empty instance
-          *
-          * @param  -
-          */
-                    Dictionary( void );
-
-        /**
           * @brief  class constructor, not initialised buffer
           *
           * @param  buffersize  buffer size
           */
-                    Dictionary( uint16_t buffersize );
+                    Dictionary( uint16_t buffersize = 256 );
 
         /**
          * @brief   returns size of data in Dictionary
@@ -111,15 +104,6 @@ class Dictionary {
          *
          * @return  byte count in array
          */
-        uint16_t    append( const char* akey, const uint8_t* data );
-
-        /**
-         * @brief   returns byte count in array
-         *
-         * @param   key and data to append
-         *
-         * @return  byte count in array
-         */
         uint16_t    append( const char* akey, char* data );
 
         /**
@@ -138,7 +122,16 @@ class Dictionary {
          *
          * @return  byte count in array
          */
-        uint16_t    append( const uint8_t* akey, const uint8_t* data );
+        uint16_t    append( const char* akey, const uint8_t* data );
+
+        /**
+         * @brief   returns byte count in array
+         *
+         * @param   key and data to append
+         *
+         * @return  byte count in array
+         */
+        uint16_t    append( const char* akey, const uint8_t* data, int size );
 
         /**
          * @brief   returns byte count in array
@@ -165,7 +158,7 @@ class Dictionary {
          *
          * @return  byte count in array
          */
-        uint16_t    append( const uint8_t* akey, std::string& aString );
+//        uint16_t    append( const uint8_t* akey, std::string& aString );
 
         /**
          * @brief   
@@ -174,7 +167,7 @@ class Dictionary {
          *
          * @return  
          */
-        uint16_t    append( const char* akey, const Dictionary aDictionary, char delimiter = '.');
+//        uint16_t    append( const char* akey, const Dictionary aDictionary, char delimiter = '.');
 
         /**
          * @brief   finds if the dictionary contains a record with a given key
@@ -183,7 +176,16 @@ class Dictionary {
          *
          * @return  the pos of the data
          */
-        uint8_t*    contains( const uint8_t* akey ) const;
+        const uint8_t*  contains( const char* akey ) const;
+
+        /**
+         * @brief   finds if the dictionary contains a record with a given key
+         *
+         * @param   -
+         *
+         * @return  the pos of the data
+         */
+        const uint8_t*  contains( const uint8_t* akey ) const;
 
         /**
          * @brief   deletes from the dictionary the record with a given key

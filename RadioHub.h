@@ -45,7 +45,7 @@ private:
     RadioHub::Client&   _Client;
 
     //<! DeviceManagement Service Access Point
-//    DeviceManagement    _DeviceMgmt;
+    DeviceManagement    _DeviceMgmt;
 
     //<! LoRaMeshRouter Service Access Point
 //    LoRaMeshRouter      _LoRaMeshRouter;
@@ -74,10 +74,10 @@ public:
     bool                Init( void );
 
     //<! accessor for DeviceManagement Service Access Point
-    //DeviceManagement&   GetDeviceManagement() { return _DeviceMgmt; }
+    DeviceManagement&   GetDeviceManagement() { return _DeviceMgmt; }
 
     //<! accessor for LoRa MeshRouter Service Access Point
-    //LoRaMeshRouter&     GetLoRaMeshRouter() { return _LoRaMeshRouter; }
+//    LoRaMeshRouter&     GetLoRaMeshRouter() { return _LoRaMeshRouter; }
 
 //public slots:
     //<! QSerialPort signal for available serial data

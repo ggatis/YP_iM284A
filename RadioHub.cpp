@@ -21,7 +21,7 @@
 RadioHub::RadioHub( RadioHub::Client& client, HardwareSerial& RadioSerial )
         : _Client           ( client )
         , _RadioSerial      ( RadioSerial )
-//        , _DeviceMgmt       ( RadioSerial )
+        , _DeviceMgmt       ( RadioSerial )
 //        , _LoRaMeshRouter   ( RadioSerial )
 //        , _Trace            ( RadioSerial )
         , _SlipDecoder      ( this ) {

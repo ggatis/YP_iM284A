@@ -131,6 +131,15 @@ SerialMessage::GetU64( int index ) const {
 }
 
 
+const uint8_t*
+SerialMessage::GetData( int index ) const {
+    if ( ( 0 <= index ) && ( index <= count() ) ) {
+        return (const uint8_t*)( data() + index );
+    }
+    return nullptr;
+}
+
+
 ByteArray
 SerialMessage::GetPayload( int index, int size ) const {
     if ( size != -1 ) {

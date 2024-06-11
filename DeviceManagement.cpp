@@ -11,6 +11,7 @@
 
 #include "DeviceManagement.h"
 #include <string>
+#include <cstring>  //strstr
 
 //#include <QDateTime>
 #include "CurrentTime.h"
@@ -154,37 +155,47 @@ DeviceManagement::OnGetSystemOptions() {
  */
 bool
 DeviceManagement::OnSetSystemOptions( const Dictionary& params ) {
+
     SerialMessage msg( DeviceManagement::Sap_ID, SetSystemOptions_Req );
 
-    QStringList optList = params[ "Options" ].toString().split( ", " );
+    uint32_t    mask    = 0;
+    uint32_t    options = 0;
 
-    uint32_t mask    = 0;
-    uint32_t options = 0;
+    char*       data    = nullptr;
 
-    if ( optList.contains( "Trace = on" ) )
-    {
-        mask    |= SO_Trace;
-        options |= SO_Trace;
-    }
-    else if ( optList.contains( "Trace = off" ) )
-    {
-        mask    |= SO_Trace;
-    }
+    static const char* Trace_on     = "Trace = on";
+    static const char* Trace_off    = "Trace = off";
+    static const char* Start_on     = "Startup Event = on";
+    static const char* Start_off    = "Startup Event = off";
 
-    if ( optList.contains( "Startup Event = on" ) )
-    {
-        mask    |= SO_StartupEvent;
-        options |= SO_StartupEvent;
-    }
-    else if ( optList.contains( "Startup Event = off" ) )
-    {
-        mask    |= SO_StartupEvent;
+    if ( ( data = (char*)params.contains("Options") ) ) {
+        if ( strstr( data, Trace_on ) ) {
+
+            mask    |= SO_Trace;
+            options |= SO_Trace;
+
+        } else if ( strstr( data, Trace_off ) ) {
+
+            mask    |= SO_Trace;
+
+        }
+        if ( strstr( data, Start_on ) ) {
+
+            mask    |= SO_StartupEvent;
+            options |= SO_StartupEvent;
+
+        } else if ( strstr( data, Start_off ) ) {
+
+            mask    |= SO_StartupEvent;
+
+        }
     }
 
     msg.Append( mask );
     msg.Append( options );
 
     return SendMessage( msg );
+
 }
 
 
@@ -230,11 +241,9 @@ DeviceManagement::OnDecodeMessage( const SerialMessage& serialMsg, Dictionary& r
 bool
 DeviceManagement::OnDefaultResponse( const SerialMessage& serialMsg, Dictionary& result ) {
     // check minimum payload length
-    if ( serialMsg.GetPayloadLength() >= 1 )
-    {
+    if ( serialMsg.GetPayloadLength() >= 1 ) {
         result.append("Status",
             _StatusCodes.value( serialMsg.GetResponseStatus(), "error" ) );
-
         return true;
     }
     return false;
@@ -259,7 +268,6 @@ DeviceManagement::OnStartupIndication( const SerialMessage& serialMsg, Dictionar
     result.append("Reserved Info",
         serialMsg.GetHexString( SerialMessage::EventData_Index, ReservedInfo_Size ) );
 #endif
-
     result.append("Device Info",
         DecodeDeviceInfo( serialMsg, SerialMessage::EventData_Index + ReservedInfo_Size ) );
     result.append("Firmware Info",
@@ -267,6 +275,7 @@ DeviceManagement::OnStartupIndication( const SerialMessage& serialMsg, Dictionar
 
     return true;
 }
+
 
 /**
  * @brief   decode get device information response
@@ -277,10 +286,8 @@ DeviceManagement::OnStartupIndication( const SerialMessage& serialMsg, Dictionar
  *
  * @return  true/false
  */
-
 bool
-DeviceManagement::OnDeviceInfoResponse( const SerialMessage& serialMsg, Dictionary& result )
-{
+DeviceManagement::OnDeviceInfoResponse( const SerialMessage& serialMsg, Dictionary& result ) {
     // check minimum response payload length
     if ( serialMsg.GetResponsePayloadLength() < DeviceInfo_Size )
         return false;
@@ -295,6 +302,7 @@ DeviceManagement::OnDeviceInfoResponse( const SerialMessage& serialMsg, Dictiona
     return true;
 }
 
+
 /**
  * @brief   decode Device Info Field
  *
@@ -303,7 +311,6 @@ DeviceManagement::OnDeviceInfoResponse( const SerialMessage& serialMsg, Dictiona
  *
  * @return  Dictionary including decoded data
  */
-
 Dictionary
 DeviceManagement::DecodeDeviceInfo( const SerialMessage& serialMsg, int index ) const {
     Dictionary info;
@@ -317,6 +324,7 @@ DeviceManagement::DecodeDeviceInfo( const SerialMessage& serialMsg, int index ) 
     return info;
 }
 
+
 /**
  * @brief   decode get firmware version response
  *
@@ -326,7 +334,6 @@ DeviceManagement::DecodeDeviceInfo( const SerialMessage& serialMsg, int index ) 
  *
  * @return  true/false
  */
-
 bool
 DeviceManagement::OnFirmwareVersionResponse( const SerialMessage& serialMsg, Dictionary& result ) {
     // check minimum payload length
@@ -343,6 +350,7 @@ DeviceManagement::OnFirmwareVersionResponse( const SerialMessage& serialMsg, Dic
     return true;
 }
 
+
 /**
  * @brief   decode Firmware Info Field
  *
@@ -351,7 +359,6 @@ DeviceManagement::OnFirmwareVersionResponse( const SerialMessage& serialMsg, Dic
  *
  * @return  Dictionary including decoded data
  */
-
 Dictionary
 DeviceManagement::DecodeFirmwareInfo( const SerialMessage& serialMsg, int index ) const {
     Dictionary info;
@@ -360,13 +367,14 @@ DeviceManagement::DecodeFirmwareInfo( const SerialMessage& serialMsg, int index 
             "." + std::to_string( serialMsg.GetU8( index ) ) );
     info.append("Build Count",
         std::to_string( serialMsg.GetU16( index + 2 ) ) );
-    info.append("Build Date",
-        std::string( serialMsg.GetPayload( index + 4, 10 ) ) );
+    info.append("Build Date", 
+        serialMsg.GetData( index + 4 ), 10 );
     info.append("Firmware Name",
-        std::string( serialMsg.GetPayload( index + 14 ) ) );
+        serialMsg.GetData( index + 14 ) );
 
     return info;
 }
+
 
 /**
  * @brief   decode get date time response
@@ -377,7 +385,6 @@ DeviceManagement::DecodeFirmwareInfo( const SerialMessage& serialMsg, int index 
  *
  * @return  true/false
  */
-
 bool
 DeviceManagement::OnDateTimeResponse( const SerialMessage& serialMsg, Dictionary& result ) {
     // check minimum payload length

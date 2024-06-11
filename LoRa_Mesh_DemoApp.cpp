@@ -44,12 +44,12 @@ LoRaMesh_DemoApp::LoRaMesh_DemoApp( HardwareSerial& RadioSerial, USBSerial& HMIS
 void
 LoRaMesh_DemoApp::print( void ) {
     Dictionary DemoInfo;
-    DemoInfo.append( "Network_ID", _Network_ID );
-    DemoInfo.append( "DeviceEUI_Node_A", _DeviceEUI_Node_A );
-    DemoInfo.append( "DeviceEUI_Node_B", _DeviceEUI_Node_B );
-    DemoInfo.append( "User_Port", "21" );
-    DemoInfo.append( "Payload_for_Node_A", _Payload_for_Node_A );
-    DemoInfo.append( "Payload_for_Node_B", _Payload_for_Node_B );
+    DemoInfo.append( "Network_ID",          _Network_ID );
+    DemoInfo.append( "DeviceEUI_Node_A",    _DeviceEUI_Node_A );
+    DemoInfo.append( "DeviceEUI_Node_B",    _DeviceEUI_Node_B );
+    DemoInfo.append( "User_Port",           "21" );
+    DemoInfo.append( "Payload_for_Node_A",  _Payload_for_Node_A );
+    DemoInfo.append( "Payload_for_Node_B",  _Payload_for_Node_B );
     DemoInfo.print( _HMISerial );
 }
 
@@ -104,13 +104,15 @@ LoRaMesh_DemoApp::OnGetSystemOptions( void )
 }
 
 void
-LoRaMesh_DemoApp::OnSetSystemOptions( void )
-{
+LoRaMesh_DemoApp::OnSetSystemOptions( void ) {
     //QJsonObject params;
+    Dictionary params;
 
     //params[ "Options" ] = "Trace = off, Startup Event = on";
-
+    params.append("Options", "Trace = off, Startup Event = on");
     //_RadioHub.GetDeviceManagement().OnSetSystemOptions( params );
+    RadioHub.GetDeviceManagement().OnSetSystemOptions( params );
+
 }
 
 // LoRaMesh Router Commands

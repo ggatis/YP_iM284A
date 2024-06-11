@@ -146,6 +146,15 @@ public:
      */
     uint64_t    GetU64( int index ) const;
 
+
+    /**
+     * @return  pointer to const uint8_t* for a given index
+     *
+     * @param   index   index to array
+     */
+    const uint8_t*  GetData( int index ) const;
+
+
     /**
      * @return  array of bytes from payload field
      *
