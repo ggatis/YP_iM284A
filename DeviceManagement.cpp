@@ -13,6 +13,8 @@
 #include <string>
 
 //#include <QDateTime>
+#include "CurrentTime.h"
+
 
 //<! map with status code strings
 const aMap < uint8_t, std::string > DeviceManagement::_StatusCodes =
@@ -120,7 +122,8 @@ bool
 DeviceManagement::OnSetDateTime() {
     SerialMessage msg( DeviceManagement::Sap_ID, SetDateTime_Req );
 
-    uint32_t  secondsSincePeriod = QDateTime::currentSecsSinceEpoch();
+    //uint32_t  secondsSincePeriod = QDateTime::currentSecsSinceEpoch();
+    uint32_t  secondsSincePeriod = getCurrentTimeInSeconds();
 
     msg.Append( secondsSincePeriod );
 
@@ -203,13 +206,14 @@ DeviceManagement::OnDecodeMessage( const SerialMessage& serialMsg, Dictionary& r
     Handler handler = _Handlers.value( msgID, nullptr );
     if ( handler != nullptr ) {
         //get handler event name
-        result.append( "Event", _EventNames.value( msgID, "unknown handler name" ) );
+        result.append("Event",
+            _EventNames.value( msgID, "unknown handler name" ) );
         //call message handler
         return ( this->*handler )( serialMsg, result );
     }
     //no handler found
-    std::string 
-    result.append( "Error", "unsupported MsgID: " + std::to_string( msgID ) + " received");
+    result.append("Error",
+        "unsupported MsgID: " + std::to_string( msgID ) + " received");
     return true;
 }
 
@@ -228,7 +232,8 @@ DeviceManagement::OnDefaultResponse( const SerialMessage& serialMsg, Dictionary&
     // check minimum payload length
     if ( serialMsg.GetPayloadLength() >= 1 )
     {
-        result[ "Status" ] = _StatusCodes.value( serialMsg.GetResponseStatus(), "error" );
+        result.append("Status",
+            _StatusCodes.value( serialMsg.GetResponseStatus(), "error" ) );
 
         return true;
     }
@@ -244,20 +249,21 @@ DeviceManagement::OnDefaultResponse( const SerialMessage& serialMsg, Dictionary&
  *
  * @return  true/false
  */
-
 bool
-DeviceManagement::OnStartupIndication( const SerialMessage& serialMsg, Dictionary& result )
-{
+DeviceManagement::OnStartupIndication( const SerialMessage& serialMsg, Dictionary& result ) {
     // check minimum payload length
     if ( serialMsg.GetPayloadLength() < ( ReservedInfo_Size + DeviceInfo_Size + FirmwareInfo_MinSize ) )
         return false;
 
 #if ReservedInfo_Size > 0
-    result[ "Reserved Info" ]   = serialMsg.GetHexString( SerialMessage::EventData_Index, ReservedInfo_Size );
+    result.append("Reserved Info",
+        serialMsg.GetHexString( SerialMessage::EventData_Index, ReservedInfo_Size ) );
 #endif
 
-    result[ "Device Info" ]     = DecodeDeviceInfo( serialMsg, SerialMessage::EventData_Index + ReservedInfo_Size );
-    result[ "Firmware Info" ]   = DecodeFirmwareInfo( serialMsg, SerialMessage::EventData_Index + ReservedInfo_Size + DeviceInfo_Size );
+    result.append("Device Info",
+        DecodeDeviceInfo( serialMsg, SerialMessage::EventData_Index + ReservedInfo_Size ) );
+    result.append("Firmware Info",
+        DecodeFirmwareInfo( serialMsg, SerialMessage::EventData_Index + ReservedInfo_Size + DeviceInfo_Size ) );
 
     return true;
 }
@@ -280,11 +286,11 @@ DeviceManagement::OnDeviceInfoResponse( const SerialMessage& serialMsg, Dictiona
         return false;
 
     uint8_t status = serialMsg.GetResponseStatus();
-    result[ "Status" ] = _StatusCodes.value( status, "error" );
+    result.append("Status", _StatusCodes.value( status, "error" ) );
 
-    if ( status == Ok )
-    {
-        result[ "Device Info" ] = DecodeDeviceInfo( serialMsg, SerialMessage::ResponseData_Index );
+    if ( Ok == status ) {
+        result.append("Device Info",
+            DecodeDeviceInfo( serialMsg, SerialMessage::ResponseData_Index ) );
     }
     return true;
 }
@@ -302,10 +308,11 @@ Dictionary
 DeviceManagement::DecodeDeviceInfo( const SerialMessage& serialMsg, int index ) const {
     Dictionary info;
     uint8_t moduleType      =   serialMsg.GetU8( index );
-    info[ "Module Type" ]   =   _ModuleTypes.value( moduleType, "unknown module type:" + std::to_string( moduleType ) );
-    info[ "Module ID" ]     =   std::to_string( serialMsg.GetU32( index + 1 ) );
-    info[ "Product Type" ]  =   serialMsg.GetHexString( index + 5, 4 );
-    info[ "Product ID" ]    =   serialMsg.GetHexString( index + 9, 4 );
+    info.append("Module Type",
+        _ModuleTypes.value( moduleType, "unknown module type:" + std::to_string( moduleType ) ) );
+    info.append("Module ID",    std::to_string( serialMsg.GetU32( index + 1 ) ) );
+    info.append("Product Type", serialMsg.GetHexString( index + 5, 4 ) );
+    info.append("Product ID",   serialMsg.GetHexString( index + 9, 4 ) );
 
     return info;
 }
@@ -327,11 +334,11 @@ DeviceManagement::OnFirmwareVersionResponse( const SerialMessage& serialMsg, Dic
         return false;
 
     uint8_t status                  =   serialMsg.GetResponseStatus();
-    result[ "Status" ]              =   _StatusCodes.value( status, "error" );
+    result.append("Status", _StatusCodes.value( status, "error" ) );
 
-    if ( status == Ok )
-    {
-        result[ "Firmware Info" ]   =   DecodeFirmwareInfo( serialMsg, SerialMessage::ResponseData_Index );
+    if ( Ok == status ) {
+        result.append("Firmware Info",
+            DecodeFirmwareInfo( serialMsg, SerialMessage::ResponseData_Index ) );
     }
     return true;
 }
@@ -348,10 +355,15 @@ DeviceManagement::OnFirmwareVersionResponse( const SerialMessage& serialMsg, Dic
 Dictionary
 DeviceManagement::DecodeFirmwareInfo( const SerialMessage& serialMsg, int index ) const {
     Dictionary info;
-    info[ "Version" ]           =   std::to_string( serialMsg.GetU8( index + 1 ) ) + "." + std::to_string( serialMsg.GetU8( index ) );
-    info[ "Build Count" ]       =   std::to_string( serialMsg.GetU16( index + 2 ) );
-    info[ "Build Date" ]        =   std::string( serialMsg.GetPayload( index + 4, 10 ) );
-    info[ "Firmware Name" ]     =   std::string( serialMsg.GetPayload( index + 14 ) );
+    info.append("Version",
+        std::to_string( serialMsg.GetU8( index + 1 ) ) + 
+            "." + std::to_string( serialMsg.GetU8( index ) ) );
+    info.append("Build Count",
+        std::to_string( serialMsg.GetU16( index + 2 ) ) );
+    info.append("Build Date",
+        std::string( serialMsg.GetPayload( index + 4, 10 ) ) );
+    info.append("Firmware Name",
+        std::string( serialMsg.GetPayload( index + 14 ) ) );
 
     return info;
 }

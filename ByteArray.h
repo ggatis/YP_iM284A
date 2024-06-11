@@ -71,6 +71,13 @@ class ByteArray {
                     ByteArray( const std::string& aString );
 
         /**
+          * @brief  class constructor from rvalue string
+          *
+          * @param  aString
+         */
+                    ByteArray( std::string&& aString );
+
+        /**
           * @brief  class copy constructor, initialised using const ByteArray,
           *         _size is reduced to _count
           *

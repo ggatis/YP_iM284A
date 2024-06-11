@@ -194,7 +194,8 @@ uint16_t     Dictionary::append( const char* akey, char* data ) {
   *
   * @return  byte count in array
   */
-uint16_t     Dictionary::append( const char* akey, const char* data ) {
+uint16_t
+Dictionary::append( const char* akey, const char* data ) {
     _keys++;
     uint8_t*    plimit  = _ByteArray.data() + _ByteArray.size();
     uint8_t*    pactual = _ByteArray.data() + _ByteArray.count();
@@ -241,6 +242,72 @@ Dictionary::append( const uint8_t* akey, const uint8_t* data ) {
   * @return  byte count in array
   */
 uint16_t
+Dictionary::append( const char* akey, std::string& aString ) {
+    //void fromCString(const char* aCString) {
+    //    _size = std::strlen(aCString);
+    //    _count = _size;
+    //    _data = new uint8_t[_size];
+    //    std::memcpy(_data, reinterpret_cast<const uint8_t*>(aCString), _size);
+    //}
+    _keys++;
+    uint8_t*    plimit  = _ByteArray.data() + _ByteArray.size();
+    uint8_t*    pactual = _ByteArray.data() + _ByteArray.count();
+    for ( ; pactual < plimit; ) {
+        if ( 0 == ( *pactual++ = (uint8_t)*akey++ ) ) break;
+    }
+    char c;
+    for ( uint16_t i = 0; i < aString.size(); ++i ) {
+        c = aString[i];
+        *pactual++ = c;
+        if ( 0 == c ) break;
+    }
+    if ( c ) *pactual++ = 0;
+    _ByteArray.update_count( (uint16_t)( pactual - _ByteArray.data() ) );
+    return (uint16_t)( pactual - _ByteArray.data() );
+}
+
+
+/**
+  * @brief   returns byte count in array
+  *
+  * @param   byte  byte to append
+  *
+  * @return  byte count in array
+  */
+uint16_t
+Dictionary::append( const char* akey, std::string&& aString ) {
+    //void fromCString(const char* aCString) {
+    //    _size = std::strlen(aCString);
+    //    _count = _size;
+    //    _data = new uint8_t[_size];
+    //    std::memcpy(_data, reinterpret_cast<const uint8_t*>(aCString), _size);
+    //}
+    _keys++;
+    uint8_t*    plimit  = _ByteArray.data() + _ByteArray.size();
+    uint8_t*    pactual = _ByteArray.data() + _ByteArray.count();
+    for ( ; pactual < plimit; ) {
+        if ( 0 == ( *pactual++ = (uint8_t)*akey++ ) ) break;
+    }
+    char c;
+    for ( uint16_t i = 0; i < aString.size(); ++i ) {
+        c = aString[i];
+        *pactual++ = c;
+        if ( 0 == c ) break;
+    }
+    if ( c ) *pactual++ = 0;
+    _ByteArray.update_count( (uint16_t)( pactual - _ByteArray.data() ) );
+    return (uint16_t)( pactual - _ByteArray.data() );
+}
+
+
+/**
+  * @brief   returns byte count in array
+  *
+  * @param   byte  byte to append
+  *
+  * @return  byte count in array
+  */
+uint16_t
 Dictionary::append( const uint8_t* akey, std::string& aString ) {
     _keys++;
     uint8_t*    plimit  = _ByteArray.data() + _ByteArray.size();
@@ -261,13 +328,76 @@ Dictionary::append( const uint8_t* akey, std::string& aString ) {
 
 
 /**
+ * @brief   
+ *
+ * @param   
+ *
+ * @return  
+ */
+uint16_t
+Dictionary::append( const char* akey, const Dictionary aDictionary, char delimiter ) {
+    uint16_t bytes = _ByteArray.count();
+    for (
+        uint16_t k = 0;
+        ( k < aDictionary.keys() ) && ( _ByteArray.count() < _ByteArray.size() );
+        k++ ) {
+
+        for ( uint16_t i = 0; i < ( _ByteArray.size() - _ByteArray.count() ); i++ ) {
+            uint8_t b = (uint8_t)akey[i];
+            if ( 0 == b ) break;
+            _ByteArray.append( b );
+        }
+        if ( ( _ByteArray.size() - _ByteArray.count() ) ) {
+            _ByteArray.append( (uint8_t)delimiter );
+        }
+        uint8_t* pkey = aDictionary.key( k );
+        for ( uint16_t i = 0; i < ( _ByteArray.size() - _ByteArray.count() ); i++ ) {
+            uint8_t b = pkey[i];
+            _ByteArray.append( b );
+            if ( 0 == b ) break;
+        }
+        //safety measure
+        if ( _ByteArray.at( _ByteArray.count() ) ) {
+            if ( _ByteArray.size() == _ByteArray.count() ) {
+                if ( _ByteArray.size() ) {
+                    _ByteArray.update_count( _ByteArray.size() - 1 );
+                    _ByteArray.append( 0 );
+                }
+            } else {
+                _ByteArray.append( 0 );
+            }
+        }
+        pkey = aDictionary.data( k );
+        for ( uint16_t i = 0; i < ( _ByteArray.size() - _ByteArray.count() ); i++ ) {
+            uint8_t b = pkey[i];
+            _ByteArray.append( b );
+            if ( 0 == b ) break;
+        }
+        //safety measure
+        if ( _ByteArray.at( _ByteArray.count() ) ) {
+            if ( _ByteArray.size() == _ByteArray.count() ) {
+                if ( _ByteArray.size() ) {
+                    _ByteArray.update_count( _ByteArray.size() - 1 );
+                    _ByteArray.append( 0 );
+                }
+            } else {
+                _ByteArray.append( 0 );
+            }
+        }
+    }
+    return _ByteArray.count() - bytes;
+}
+
+
+/**
  * @brief   finds if the dictionary contains a record with a given key
  *
  * @param   -
  *
  * @return  the pos of the data
  */
-uint8_t*    Dictionary::contains( const uint8_t* akey ) const {
+uint8_t*
+Dictionary::contains( const uint8_t* akey ) const {
     uint16_t k;
     uint8_t* testkey;
     uint8_t* keycopy;

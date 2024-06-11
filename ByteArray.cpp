@@ -85,6 +85,17 @@ ByteArray::ByteArray( const std::string& aString ) :
 
 
 /**
+  * @brief  class constructor from rvalue string
+  *
+  * @param  aString
+ */
+ByteArray::ByteArray( std::string&& aString ) :
+    _size( aString.size() ), _count( aString.size() ), _data( new uint8_t[aString.size()] ) {
+    std::memcpy( _data, aString.data(), aString.size() );
+}
+
+
+/**
   * @brief  class copy constructor, initialised using const ByteArray,
   *         _size is reduced to _count
   *

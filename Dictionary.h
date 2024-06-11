@@ -147,7 +147,34 @@ class Dictionary {
          *
          * @return  byte count in array
          */
+        uint16_t    append( const char* akey, std::string& aString );
+
+        /**
+         * @brief   returns byte count in array
+         *
+         * @param   key and data to append
+         *
+         * @return  byte count in array
+         */
+        uint16_t    append( const char* akey, std::string&& aString );
+
+        /**
+         * @brief   returns byte count in array
+         *
+         * @param   key and data to append
+         *
+         * @return  byte count in array
+         */
         uint16_t    append( const uint8_t* akey, std::string& aString );
+
+        /**
+         * @brief   
+         *
+         * @param   
+         *
+         * @return  
+         */
+        uint16_t    append( const char* akey, const Dictionary aDictionary, char delimiter = '.');
 
         /**
          * @brief   finds if the dictionary contains a record with a given key
