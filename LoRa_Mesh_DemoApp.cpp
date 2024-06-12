@@ -111,7 +111,7 @@ LoRaMesh_DemoApp::OnSetSystemOptions( void ) {
     //params[ "Options" ] = "Trace = off, Startup Event = on";
     params.append("Options", "Trace = off, Startup Event = on");
     //_RadioHub.GetDeviceManagement().OnSetSystemOptions( params );
-    RadioHub.GetDeviceManagement().OnSetSystemOptions( params );
+    GetDeviceManagement().OnSetSystemOptions( params );
 
 }
 
@@ -150,8 +150,7 @@ LoRaMesh_DemoApp::OnGetMode( void ) {
 }
 
 void
-LoRaMesh_DemoApp::OnDisableRouter( void )
-{
+LoRaMesh_DemoApp::OnDisableRouter( void ) {
     //QJsonObject params;
 
     //params[ "Mode" ]  = "Off";

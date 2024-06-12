@@ -35,7 +35,7 @@ HardwareSerial Serial1( USART1 );   //Radio
 HardwareSerial Serial2( PA3, PA2 ); //monitor
 
 #include "LoRa_Mesh_DemoApp.h"
-LoRaMesh_DemoApp DemoApp( Serial1, SerialUSB );
+//LoRaMesh_DemoApp DemoApp( Serial1, SerialUSB );
 
 //LED
 #define LED_BUILTIN   13
@@ -120,7 +120,7 @@ void setup( void ) {
   SerialUSB.println( F("") );
   SerialUSB.println( F("") );
   SerialUSB.println( F("") );
-  SerialUSB.println("YP_iM284A.ino: test of iM284A HCI v0.2:");
+  SerialUSB.println( F("YP_iM284A.ino: test of iM284A HCI v0.2:") );
   
   printUsage();
 
@@ -191,7 +191,7 @@ void CommandHandler( void ) {
 }
 
 void RadioHandler( void ) {
-  if ( DemoApp.GetSerial.available() )
+  if ( DemoApp.GetSerial().available() )
     DemoApp.OnSerialPort_ReadyRead();
 }
 

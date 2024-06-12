@@ -18,8 +18,8 @@
 
 
 //<! map with status code strings
-const aMap < uint8_t, std::string > DeviceManagement::_StatusCodes =
-{
+//const aMap < uint8_t, std::string > DeviceManagement::_StatusCodes = {
+const aMap < uint8_t, const char* > DeviceManagement::_StatusCodes = {
     { Ok,                       "ok" },
     { Error,                    "error" },
     { CommandNotSupported,      "command not supported" },
@@ -34,8 +34,8 @@ const aMap < uint8_t, std::string > DeviceManagement::_StatusCodes =
 };
 
 //<! map with module type strings
-const aMap < uint8_t, std::string > DeviceManagement::_ModuleTypes =
-{
+//const aMap < uint8_t, std::string > DeviceManagement::_ModuleTypes = {
+const aMap < uint8_t, const char* > DeviceManagement::_ModuleTypes = {
     { 104,  "iM284A-XL" },
     { 109,  "iM891A-XL" },
     { 110,  "iU891A-XL" },
@@ -43,8 +43,8 @@ const aMap < uint8_t, std::string > DeviceManagement::_ModuleTypes =
 };
 
 //<! map with response & event names for HCI messages
-const aMap < uint8_t , std::string > DeviceManagement::_EventNames =
-{
+//const aMap < uint8_t, std::string > DeviceManagement::_EventNames = {
+const aMap < uint8_t, const char* > DeviceManagement::_EventNames = {
     { Startup_Ind,              "startup indication" },
     { Ping_Rsp,                 "ping device response" },
     { GetDeviceInfo_Rsp,        "get device info response" },
@@ -57,8 +57,7 @@ const aMap < uint8_t , std::string > DeviceManagement::_EventNames =
 };
 
 //<! map with message handlers for HCI messages
-const aMap < uint8_t , DeviceManagement::Handler > DeviceManagement::_Handlers =
-{
+const aMap < uint8_t , DeviceManagement::Handler > DeviceManagement::_Handlers = {
     { Startup_Ind,              &DeviceManagement::OnStartupIndication },
     { Ping_Rsp,                 &DeviceManagement::OnDefaultResponse },
     { GetDeviceInfo_Rsp,        &DeviceManagement::OnDeviceInfoResponse },
@@ -223,8 +222,10 @@ DeviceManagement::OnDecodeMessage( const SerialMessage& serialMsg, Dictionary& r
         return ( this->*handler )( serialMsg, result );
     }
     //no handler found
-    result.append("Error",
-        "unsupported MsgID: " + std::to_string( msgID ) + " received");
+    
+    result.append  ("Error", "unsupported MsgID: ");
+    result.appendU8( msgID );
+    result.append  (" received");
     return true;
 }
 
@@ -315,9 +316,13 @@ Dictionary
 DeviceManagement::DecodeDeviceInfo( const SerialMessage& serialMsg, int index ) const {
     Dictionary info;
     uint8_t moduleType      =   serialMsg.GetU8( index );
+    //info.append("Module Type",
+    //    _ModuleTypes.value( moduleType, "unknown module type:" + std::to_string( moduleType ) ) );
     info.append("Module Type",
-        _ModuleTypes.value( moduleType, "unknown module type:" + std::to_string( moduleType ) ) );
-    info.append("Module ID",    std::to_string( serialMsg.GetU32( index + 1 ) ) );
+        _ModuleTypes.value( moduleType, "unknown module type: " ) );
+    info.appendU8( moduleType );
+    //info.append("Module ID",    std::to_string( serialMsg.GetU32( index + 1 ) ) );
+    info.append("Module ID",    serialMsg.GetU32( index + 1 ) );
     info.append("Product Type", serialMsg.GetHexString( index + 5, 4 ) );
     info.append("Product ID",   serialMsg.GetHexString( index + 9, 4 ) );
 

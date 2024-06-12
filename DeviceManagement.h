@@ -156,13 +156,16 @@ private:
     typedef bool (DeviceManagement::*Handler)( const SerialMessage& serialMsg, Dictionary& response );
 
     //<! map with status code strings
-    static const aMap < uint8_t, std::string >  _StatusCodes;
+    //static const aMap < uint8_t, std::string >  _StatusCodes;
+    static const aMap < uint8_t, const char* >  _StatusCodes;
 
     //<! map with module types
-    static const aMap < uint8_t, std::string >  _ModuleTypes;
+    //static const aMap < uint8_t, std::string >  _ModuleTypes;
+    static const aMap < uint8_t, const char* >  _ModuleTypes;
 
     //<! map with message handler debug info
-    static const aMap < uint8_t, std::string >  _EventNames;
+    //static const aMap < uint8_t, std::string >  _EventNames;
+    static const aMap < uint8_t, const char* >  _EventNames;
 
     //<! map with message handlers
     static const aMap < uint8_t, Handler >  _Handlers;

@@ -16,6 +16,7 @@
 //#include <cstring>          //nullptr
 #include "Dictionary.h"
 
+static char snBuffer[20];
 
 uint8_t* skipNzeros( uint8_t* ptr, uint16_t n, uint16_t dicsize ) {
 //    uint16_t dicsize = _ByteArray.count();
@@ -113,7 +114,8 @@ uint8_t*    Dictionary::data( uint16_t n ) const {
  *
  * @return  key[n] size not including end separator
  */
-uint16_t    Dictionary::sizeof_key( uint16_t n ) const {
+uint16_t
+Dictionary::sizeof_key( uint16_t n ) const {
     uint16_t    dicsize = _ByteArray.count();
     uint8_t*    pbegin  = _ByteArray.data();
     uint8_t*    pkeyn   = key( n );
@@ -127,11 +129,72 @@ uint16_t    Dictionary::sizeof_key( uint16_t n ) const {
  *
  * @return  data[n] size not including end separator
  */
-uint16_t    Dictionary::sizeof_data( uint16_t n ) const {
+uint16_t
+Dictionary::sizeof_data( uint16_t n ) const {
     uint16_t    dicsize = _ByteArray.count();
     uint8_t*    pbegin  = _ByteArray.data();
     uint8_t*    pkeyn   = data( n );
     return scan0FromHere( pkeyn, dicsize - (uint16_t)( pkeyn - pbegin ) );
+}
+
+
+/**
+ * @brief   returns byte count in array
+ *
+ * @param   key and data to append
+ *
+ * @return  byte count in array
+ */
+uint16_t
+Dictionary::append( const char* data, bool Continue ) {
+    uint8_t*    plimit  = _ByteArray.data() + _ByteArray.size();
+    //overwrite last 0
+    uint8_t*    pactual = Continue ?
+         ( _ByteArray.count() ? 
+            _ByteArray.data() + _ByteArray.count() - 1:
+            _ByteArray.data() ):
+         _ByteArray.data() + _ByteArray.count();
+    for ( ; pactual < plimit; ) {
+        if ( 0 == ( *pactual++ = (uint8_t)*data++ ) ) goto skip_endmarking;
+    }
+    *( pactual - 1 ) = 0;
+skip_endmarking:
+    _ByteArray.update_count( (uint16_t)( pactual - _ByteArray.data() ) );
+    return _ByteArray.count();
+}
+
+
+/**
+ * @brief   returns byte count in array
+ *
+ * @param   key and data to append
+ *
+ * @return  byte count in array
+ */
+uint16_t
+Dictionary::appendU8( uint8_t n, bool Continue ) {
+
+    const char* format = "%d";
+    snprintf( snBuffer, sizeof( snBuffer ), format, n );
+
+    return append( (const char*)snBuffer, Continue );
+}
+
+
+/**
+ * @brief   returns byte count in array
+ *
+ * @param   key and data to append
+ *
+ * @return  byte count in array
+ */
+uint16_t
+Dictionary::appendU32( uint32_t n, bool Continue ) {
+
+    const char* format = "%d";
+    snprintf( snBuffer, sizeof( snBuffer ), format, n );
+
+    return append( (const char*)snBuffer, Continue );
 }
 
 
@@ -145,7 +208,7 @@ uint16_t    Dictionary::sizeof_data( uint16_t n ) const {
 uint16_t
 Dictionary::append( const char* akey, char* data ) {
     _keys++;
-    uint8_t*    plimit  = _ByteArray.data() + _ByteArray.size();
+/*    uint8_t*    plimit  = _ByteArray.data() + _ByteArray.size();
     uint8_t*    pactual = _ByteArray.data() + _ByteArray.count();
     for ( ; pactual < plimit; ) {
         if ( 0 == ( *pactual++ = (uint8_t)*akey++ ) ) goto skip_endmarking1;
@@ -159,6 +222,8 @@ skip_endmarking1:
 skip_endmarking2:
     _ByteArray.update_count( (uint16_t)( pactual - _ByteArray.data() ) );
     return _ByteArray.count();
+*/
+    return append( akey, false ) + append( data, false );
 }
 
 
@@ -262,6 +327,34 @@ skip_endmarking8:
     }
     _ByteArray.update_count( (uint16_t)( pactual - _ByteArray.data() ) );
     return _ByteArray.count();
+}
+
+
+/**
+ * @brief   returns byte count in array
+ *
+ * @param   key and data to append
+ *
+ * @return  byte count in array
+ */
+uint16_t
+Dictionary::append( const char* akey, uint8_t n ) {
+    _keys++;
+    return append( akey, false ) + appendU8( n, false );
+}
+
+
+/**
+ * @brief   returns byte count in array
+ *
+ * @param   key and data to append
+ *
+ * @return  byte count in array
+ */
+uint16_t
+Dictionary::append( const char* akey, uint32_t n ) {
+    _keys++;
+    return append( akey, false ) + appendU32( n, false );
 }
 
 
@@ -386,61 +479,72 @@ Dictionary::append( const uint8_t* akey, std::string& aString ) {
  *
  * @return  
  */
-/*
 uint16_t
 Dictionary::append( const char* akey, const Dictionary aDictionary, char delimiter ) {
-    uint16_t bytes = _ByteArray.count();
-    for (
-        uint16_t k = 0;
-        ( k < aDictionary.keys() ) && ( _ByteArray.count() < _ByteArray.size() );
-        k++ ) {
-
-        for ( uint16_t i = 0; i < ( _ByteArray.size() - _ByteArray.count() ); i++ ) {
-            uint8_t b = (uint8_t)akey[i];
+    uint16_t oldCount = _ByteArray.count();
+    uint8_t b;
+    uint8_t* puint8;
+    //aDictionary keys
+    for ( uint16_t k = 0; k < aDictionary.keys(); k++ ) {
+        //akey, no 0 after
+        if ( _ByteArray.size() == _ByteArray.count() )
+            goto finita;
+        for ( uint16_t i = 0; ; i++ ) {
+            b = (uint8_t)akey[i];
             if ( 0 == b ) break;
             _ByteArray.append( b );
+            if ( _ByteArray.size() == _ByteArray.count() )
+                goto finita;
         }
-        if ( ( _ByteArray.size() - _ByteArray.count() ) ) {
-            _ByteArray.append( (uint8_t)delimiter );
-        }
-        uint8_t* pkey = aDictionary.key( k );
-        for ( uint16_t i = 0; i < ( _ByteArray.size() - _ByteArray.count() ); i++ ) {
-            uint8_t b = pkey[i];
+        _ByteArray.append( (uint8_t)delimiter );
+        if ( _ByteArray.size() == _ByteArray.count() )
+            goto finita;
+        //key
+        puint8 = aDictionary.key( k );
+        for ( uint16_t i = 0; ; i++ ) {
+            b = puint8[i];
             _ByteArray.append( b );
+            if ( _ByteArray.size() == _ByteArray.count() )
+                goto finita;
             if ( 0 == b ) break;
         }
-        //safety measure
+        //safety measure ensuring 0 after key
         if ( _ByteArray.at( _ByteArray.count() ) ) {
             if ( _ByteArray.size() == _ByteArray.count() ) {
-                if ( _ByteArray.size() ) {
-                    _ByteArray.update_count( _ByteArray.size() - 1 );
-                    _ByteArray.append( 0 );
-                }
+                goto finita;
             } else {
                 _ByteArray.append( 0 );
             }
         }
-        pkey = aDictionary.data( k );
+        //key
+        puint8 = aDictionary.data( k );
         for ( uint16_t i = 0; i < ( _ByteArray.size() - _ByteArray.count() ); i++ ) {
-            uint8_t b = pkey[i];
+            uint8_t b = puint8[i];
             _ByteArray.append( b );
+            if ( _ByteArray.size() == _ByteArray.count() )
+                goto finita;
             if ( 0 == b ) break;
         }
-        //safety measure
+        //safety measure ensuring 0 after data
         if ( _ByteArray.at( _ByteArray.count() ) ) {
             if ( _ByteArray.size() == _ByteArray.count() ) {
-                if ( _ByteArray.size() ) {
-                    _ByteArray.update_count( _ByteArray.size() - 1 );
-                    _ByteArray.append( 0 );
-                }
+                goto finita;
             } else {
                 _ByteArray.append( 0 );
             }
         }
     }
-    return _ByteArray.count() - bytes;
+    if ( _ByteArray.count() == _ByteArray.size() ) {
+finita:
+        //overdose
+        if ( _ByteArray.size() ) {
+            _ByteArray.update_count( _ByteArray.size() - 1 );
+            _ByteArray.append( 0 );
+        }
+    }
+    return _ByteArray.count() - oldCount;
 }
-*/
+
 
 /**
  * @brief   finds if the dictionary contains a record with a given key

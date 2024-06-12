@@ -22,6 +22,6 @@
  */
 void printSTDstring( const std::string& aString ) {
     for ( uint16_t i = 0; i < aString.size(); ++i ) {
-        SerialUSB.print( str[i] );
+        SerialUSB.print( aString[i] );
     }
 }

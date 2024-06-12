@@ -104,6 +104,33 @@ class Dictionary {
          *
          * @return  byte count in array
          */
+        uint16_t    append( const char* data, bool Continue = true );
+
+        /**
+         * @brief   returns byte count in array
+         *
+         * @param   key and data to append
+         *
+         * @return  byte count in array
+         */
+        uint16_t    appendU8( uint8_t n, bool Continue = true );
+
+        /**
+         * @brief   returns byte count in array
+         *
+         * @param   key and data to append
+         *
+         * @return  byte count in array
+         */
+        uint16_t    appendU32( uint32_t n, bool Continue = true );
+
+        /**
+         * @brief   returns byte count in array
+         *
+         * @param   key and data to append
+         *
+         * @return  byte count in array
+         */
         uint16_t    append( const char* akey, char* data );
 
         /**
@@ -140,6 +167,24 @@ class Dictionary {
          *
          * @return  byte count in array
          */
+        uint16_t    append( const char* akey, uint8_t n );
+
+        /**
+         * @brief   returns byte count in array
+         *
+         * @param   key and data to append
+         *
+         * @return  byte count in array
+         */
+        uint16_t    append( const char* akey, uint32_t n );
+
+        /**
+         * @brief   returns byte count in array
+         *
+         * @param   key and data to append
+         *
+         * @return  byte count in array
+         */
         uint16_t    append( const char* akey, std::string& aString );
 
         /**
@@ -167,7 +212,7 @@ class Dictionary {
          *
          * @return  
          */
-//        uint16_t    append( const char* akey, const Dictionary aDictionary, char delimiter = '.');
+        uint16_t    append( const char* akey, const Dictionary aDictionary, char delimiter = '.');
 
         /**
          * @brief   finds if the dictionary contains a record with a given key
