@@ -17,6 +17,9 @@
 #include "iM284A.h"
 #include "iM284A_L0.h"
 
+#include "LoRa_Mesh_DemoApp.h"
+extern LoRaMesh_DemoApp* pDemoApp;
+
 
 const char cDescription00[] = "print usage";
 const char cDescription0Q[] = "quit";
@@ -69,7 +72,7 @@ const Command_t Commands_L0[] = {
   { 'j', cDescription0j, &SendPacketToNode_A },
   { 'k', cDescription0k, &SendPacketToNode_B },
   { '-', cDescription0C, nullptr },
-  { 'p', cDescription0k, &printDemo }
+  { 'p', cDescription0p, &printDemo }
 };
 
 const uint8_t cntCommands_L0 = sizeof( Commands_L0 ) / sizeof( Commands_L0[0] );
@@ -78,7 +81,7 @@ const uint8_t cntCommands_L0 = sizeof( Commands_L0 ) / sizeof( Commands_L0[0] );
 /*************************************************/
 
 void printDemo( void ) {
-    DemoApp.print();
+    pDemoApp->print();
 }
 
 void printUsage( void ) {
@@ -91,7 +94,7 @@ void printUsage( void ) {
 
 void quitDemo( void ) {
     SerialUSB.println( F("Quit?") );
-    DemoApp.OnExit();
+    pDemoApp->OnExit();
 }
 
 
@@ -99,42 +102,42 @@ void quitDemo( void ) {
 
 void PingDevice( void ) {
     SerialUSB.println( F("PingDevice") );
-    DemoApp.OnPingDevice();
+    pDemoApp->OnPingDevice();
 }
 
 void GetDeviceInformation( void ) {
     SerialUSB.println( F("GetDeviceInformation") );
-    DemoApp.OnGetDeviceInformation();
+    pDemoApp->OnGetDeviceInformation();
 }
 
 void GetFirmwareVersion( void ) {
     SerialUSB.println( F("GetFirmwareVersion") );
-    DemoApp.OnGetFirmwareVersion();
+    pDemoApp->OnGetFirmwareVersion();
 }
 
 void GetDateTime( void ) {
     SerialUSB.println( F("GetDateTime") );
-    DemoApp.OnGetDateTime();
+    pDemoApp->OnGetDateTime();
 }
 
 void SetDateTime( void ) {
     SerialUSB.println( F("SetDateTime") );
-    DemoApp.OnSetDateTime();
+    pDemoApp->OnSetDateTime();
 }
 
 void RestartDevice( void ) {
     SerialUSB.println( F("RestartDevice") );
-    DemoApp.OnRestartDevice();
+    pDemoApp->OnRestartDevice();
 }
 
 void GetSystemOptions( void ) {
     SerialUSB.println( F("GetSystemOptions") );
-    DemoApp.OnGetSystemOptions();
+    pDemoApp->OnGetSystemOptions();
 }
 
 void SetSystemOptions( void ) {
     SerialUSB.println( F("SetSystemOptions") );
-    DemoApp.OnGetSystemOptions();
+    pDemoApp->OnGetSystemOptions();
 }
 
 
@@ -142,55 +145,55 @@ void SetSystemOptions( void ) {
 
 void GetNetworkAddress( void ) {
     SerialUSB.println( F("GetNetworkAddress") );
-    DemoApp.OnGetNetworkAddress();
+    pDemoApp->OnGetNetworkAddress();
 }
 
 void SetNetworkAddress_A( void ) {
     SerialUSB.println( F("SetNetworkAddress_A") );
-    DemoApp.OnSetNetworkAddress_A();
+    pDemoApp->OnSetNetworkAddress_A();
 }
 
 void SetNetworkAddress_B( void ) {
     SerialUSB.println( F("SetNetworkAddress_B") );
-    DemoApp.OnSetNetworkAddress_B();
+    pDemoApp->OnSetNetworkAddress_B();
 }
 
 void GetMode( void ) {
     SerialUSB.println( F("GetMode") );
-    DemoApp.OnGetMode();
+    pDemoApp->OnGetMode();
 }
 
 void DisableRouter( void ) {
     SerialUSB.println( F("DisableRouter") );
-    DemoApp.OnDisableRouter();
+    pDemoApp->OnDisableRouter();
 }
 
 void EnableRouter( void ) {
     SerialUSB.println( F("EnableRouter") );
-    DemoApp.OnEnableRouter();
+    pDemoApp->OnEnableRouter();
 }
 
 void EnableCoordinator( void ) {
     SerialUSB.println( F("EnableCoordinator") );
-    DemoApp.OnEnableCoordinator();
+    pDemoApp->OnEnableCoordinator();
 }
 
 void GetLinkStatus( void ) {
     SerialUSB.println( F("GetLinkStatus") );
-    DemoApp.OnGetLinkStatus();
+    pDemoApp->OnGetLinkStatus();
 }
 
 void GetRoutingInfo( void ) {
     SerialUSB.println( F("GetRoutingInfo") );
-    DemoApp.OnGetRoutingInfo();
+    pDemoApp->OnGetRoutingInfo();
 }
 
 void SendPacketToNode_A( void ) {
     SerialUSB.println( F("SendPacketToNode_A") );
-    DemoApp.OnSendPacketToNode_A();
+    pDemoApp->OnSendPacketToNode_A();
 }
 
 void SendPacketToNode_B( void ) {
     SerialUSB.println( F("SendPacketToNode_B") );
-    DemoApp.OnSendPacketToNode_B();
+    pDemoApp->OnSendPacketToNode_B();
 }

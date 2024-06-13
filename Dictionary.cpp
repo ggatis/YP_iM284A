@@ -27,11 +27,24 @@ uint8_t* skipNzeros( uint8_t* ptr, uint16_t n, uint16_t dicsize ) {
 //        n--;
 //    }
 //    return ptr;
+    //debug--vvv
+    //SerialUSB.println();
+    //debug--^^^
+    if ( 0 == n ) return ptr;
     uint8_t* i = ptr;
-    for ( ; n && ( i < ( ptr + dicsize ) ); i++ ) {
-        if ( 0 == *i ) n--;
+    for ( ; i < ( ptr + dicsize ); i++ ) {
+        //debug--vvv
+        //SerialUSB.print( (char)*i );
+        //debug--^^^
+        if ( 0 == *i ) {
+            n--;
+            //debug--vvv
+            //SerialUSB.println();
+            //debug--^^^
+        }
+        if ( 0 == n ) return ++i;
     }
-    return ++i;
+    return nullptr;
 }
 
 uint16_t scan0FromHere( uint8_t* ptr, uint16_t maxsize ) {
@@ -104,7 +117,7 @@ uint8_t*    Dictionary::key( uint16_t n ) const {
  * @return  pointer to dictionary data[n]
  */
 uint8_t*    Dictionary::data( uint16_t n ) const {
-    return skipNzeros( _ByteArray.data(), 1 + n << 1, _ByteArray.count() );
+    return skipNzeros( _ByteArray.data(), 1 + ( n << 1 ), _ByteArray.count() );
 }
 
 /**
