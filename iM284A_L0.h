@@ -43,5 +43,6 @@ void GetLinkStatus( void );
 void GetRoutingInfo( void );
 void SendPacketToNode_A( void );
 void SendPacketToNode_B( void );
+void testRadioSerialMonitor( void );
 
 #endif // _iM284A_L0_h_

@@ -14,6 +14,7 @@
 
 
 volatile uint32_t mySysTick = 0;
+volatile uint32_t lastS2IOtick;
 volatile uint8_t  ActiveCommand = 0;
 
 
@@ -21,6 +22,9 @@ volatile uint8_t  ActiveCommand = 0;
 //#include "Utils/Console.h"
 
 #include "ByteArray.h"
+
+ByteArray* pRaMonBuff;
+
 #include "CRC16.h"
 #include "SlipDecoder.h"
 #include "SlipEncoder.h"
@@ -33,6 +37,8 @@ volatile uint8_t  ActiveCommand = 0;
 HardwareSerial Serial1( USART1 );   //Radio
 //HardwareSerial Serial2( USART2 );
 HardwareSerial Serial2( PA3, PA2 ); //monitor
+
+#include "CurrentTime.h"
 
 #include "LoRa_Mesh_DemoApp.h"
 LoRaMesh_DemoApp* pDemoApp;
@@ -101,6 +107,19 @@ void _100msCallback( void ) {
   } else if ( 9 == mSeconds100 ) {
     LEDon();
   }
+#if 0 == _SYSTIME_
+  addCurrentTimeInUSeconds( 100000 );
+#endif
+}
+
+
+void serialEvent2() {
+    lastS2IOtick = mySysTick;
+    //while ( 0 < Serial2.available() ) {
+    //    //pRaMonBuff->append( (uint8_t)Serial2.read() );
+    //    Serial2.read();
+    //}
+    Serial2.read();
 }
 
 ////
@@ -122,6 +141,10 @@ void setup( void ) {
   
   printUsage();
 
+#if 0 == _SYSTIME_
+  initCurrentTime();
+#endif
+
 #if defined( TIM1 )
   TIM_TypeDef *Instance = TIM1;
 #else
@@ -140,6 +163,8 @@ void setup( void ) {
   Serial1.begin( 115200 );
   Serial2.begin( 115200 );
 
+  pRaMonBuff = new ByteArray( 300 );
+  
   pDemoApp = new LoRaMesh_DemoApp( Serial1, SerialUSB );
   pDemoApp->print();
 
@@ -194,15 +219,16 @@ void RadioHandler( void ) {
     pDemoApp->OnSerialPort_ReadyRead();
 }
 
+#define MonitorDelayTicks 1
+
 void MonitorHandler( void ) {
-  if ( Serial2.available() ) {
-    SerialUSB.print( F("To radio:") );
-    while( Serial2.available() ) {
-      char inChar = Serial2.read();
-      SerialUSB.print( inChar );
-    }      
-    SerialUSB.println();
-  }
+    if ( pRaMonBuff->count() ) {
+        if (
+            ( mySysTick >= ( lastS2IOtick + MonitorDelayTicks ) ) ||
+            ( pRaMonBuff->count() > ( pRaMonBuff->size() - 10 ) ) ) {
+            pRaMonBuff->print( SerialUSB );
+        }
+    }
 }
 
 //SerialUSB: commands from PC

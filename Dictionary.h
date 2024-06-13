@@ -15,8 +15,6 @@
 #define _Dictionary_H_
 
 #include <stdint.h>
-#include <USBSerial.h>
-#include "HardwareSerial.h"
 #include "ByteArray.h"
 
 /**

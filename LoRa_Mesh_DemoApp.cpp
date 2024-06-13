@@ -65,42 +65,37 @@ LoRaMesh_DemoApp::OnExit( void ) {
 
 void
 LoRaMesh_DemoApp::OnPingDevice( void ) {
-    //_RadioHub.GetDeviceManagement().OnPingDevice();
+    GetDeviceManagement().OnPingDevice();
 }
 
 void
 LoRaMesh_DemoApp::OnGetDeviceInformation( void ) {
-    //_RadioHub.GetDeviceManagement().OnGetDeviceInfo();
+    GetDeviceManagement().OnGetDeviceInfo();
 }
 
 void
-LoRaMesh_DemoApp::OnGetFirmwareVersion( void )
-{
-    //_RadioHub.GetDeviceManagement().OnGetFirmwareVersion();
+LoRaMesh_DemoApp::OnGetFirmwareVersion( void ) {
+    GetDeviceManagement().OnGetFirmwareVersion();
 }
 
 void
-LoRaMesh_DemoApp::OnGetDateTime( void )
-{
-    //_RadioHub.GetDeviceManagement().OnGetDateTime();
+LoRaMesh_DemoApp::OnGetDateTime( void ) {
+    GetDeviceManagement().OnGetDateTime();
 }
 
 void
-LoRaMesh_DemoApp::OnSetDateTime( void )
-{
-    //_RadioHub.GetDeviceManagement().OnSetDateTime();
+LoRaMesh_DemoApp::OnSetDateTime( void ) {
+    GetDeviceManagement().OnSetDateTime();
 }
 
 void
-LoRaMesh_DemoApp::OnRestartDevice( void )
-{
-    //_RadioHub.GetDeviceManagement().OnRestartDevice();
+LoRaMesh_DemoApp::OnRestartDevice( void ) {
+    GetDeviceManagement().OnRestartDevice();
 }
 
 void
-LoRaMesh_DemoApp::OnGetSystemOptions( void )
-{
-    //_RadioHub.GetDeviceManagement().OnGetSystemOptions();
+LoRaMesh_DemoApp::OnGetSystemOptions( void ) {
+    GetDeviceManagement().OnGetSystemOptions();
 }
 
 void
@@ -219,6 +214,12 @@ LoRaMesh_DemoApp::OnSendPacketToNode_B( void ) {
     //params[ "Payload" ]         = _Payload_for_Node_B;
 
     //_RadioHub.GetLoRaMeshRouter().OnSendPacket( params );
+}
+
+void
+LoRaMesh_DemoApp::TestRadioSerialMonitor( void ) {
+    _HMISerial.println( F("Sending ZZZ") );
+    GetSerial().print( F("ZZZ") );
 }
 
 

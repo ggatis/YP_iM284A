@@ -46,6 +46,7 @@ const char cDescription0j[] = "send Packet to Node(A)";
 const char cDescription0k[] = "send Packet to Node(B)";
 const char cDescription0C[] = "Misc";
 const char cDescription0p[] = "print demo setup";
+const char cDescription0t[] = "test radio serial monitor";
 
 const Command_t Commands_L0[] = {
   { ' ', cDescription00, &printUsage },
@@ -72,17 +73,14 @@ const Command_t Commands_L0[] = {
   { 'j', cDescription0j, &SendPacketToNode_A },
   { 'k', cDescription0k, &SendPacketToNode_B },
   { '-', cDescription0C, nullptr },
-  { 'p', cDescription0p, &printDemo }
+  { 'p', cDescription0p, &printDemo },
+  { 't', cDescription0t, &testRadioSerialMonitor }
 };
 
 const uint8_t cntCommands_L0 = sizeof( Commands_L0 ) / sizeof( Commands_L0[0] );
 
 
 /*************************************************/
-
-void printDemo( void ) {
-    pDemoApp->print();
-}
 
 void printUsage( void ) {
   for ( 
@@ -196,4 +194,16 @@ void SendPacketToNode_A( void ) {
 void SendPacketToNode_B( void ) {
     SerialUSB.println( F("SendPacketToNode_B") );
     pDemoApp->OnSendPacketToNode_B();
+}
+
+
+/*** Rest ***/
+
+void printDemo( void ) {
+    pDemoApp->print();
+}
+
+void testRadioSerialMonitor( void ) {
+    SerialUSB.println( F("testRadioSerialMonitor") );
+    pDemoApp->TestRadioSerialMonitor();
 }

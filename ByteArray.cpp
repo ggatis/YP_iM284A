@@ -420,3 +420,33 @@ ByteArray::chop( int n ) {
     }
     return *this;
 }
+
+
+/**
+ * @brief   prints the buffer ar chars
+ *
+ * @param   -
+ *
+ * @return  -
+ */
+void
+ByteArray::print( HardwareSerial Serial ) const {
+    for ( uint16_t i = 0; i < count(); i++ ) {
+        Serial.print( (char)at( i ) );
+    }
+}
+
+
+/**
+ * @brief   prints the buffer ar chars
+ *
+ * @param   -
+ *
+ * @return  -
+ */
+void
+ByteArray::print( USBSerial Serial ) const {
+    for ( uint16_t i = 0; i < count(); i++ ) {
+        Serial.print( (char)at( i ) );
+    }
+}

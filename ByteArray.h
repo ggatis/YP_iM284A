@@ -17,6 +17,10 @@
 #include <string>
 #include <stdint.h>
 
+#include <USBSerial.h>
+#include "HardwareSerial.h"
+
+
 /**
  * @brief   The ByteArray class provides methods for ByteArray.
  */
@@ -224,6 +228,24 @@ class ByteArray {
          * @return  ByteArray
          */
         ByteArray   chop( int n );
+
+        /**
+         * @brief   prints the buffer ar chars
+         *
+         * @param   -
+         *
+         * @return  -
+         */
+        void        print( HardwareSerial Serial ) const;
+
+        /**
+         * @brief   prints the buffer ar chars
+         *
+         * @param   -
+         *
+         * @return  -
+         */
+        void        print( USBSerial Serial ) const;
 
     private:
         //<! size

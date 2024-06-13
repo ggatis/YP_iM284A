@@ -16,7 +16,22 @@
 
 #include <cstdint>
 
+
+#define _SYSTIME_ 0  //1: sys/time.h, 0: internal
+
+
+#if 1 == _SYSTIME_
+
 //get the current time in seconds since the epoch
-uint32_t getCurrentTimeInSeconds();
+uint32_t    getCurrentTimeInSeconds( void );
+
+#else
+
+void        initCurrentTime( void );
+uint32_t    getCurrentTimeInSeconds( void );
+void        setCurrentTimeInSeconds( uint32_t CurrentTimeInSeconds );
+void        addCurrentTimeInUSeconds( uint32_t USeconds );
+
+#endif
 
 #endif // _CURRENTTIME_H_

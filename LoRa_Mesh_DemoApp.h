@@ -128,6 +128,8 @@ public:
     void                    OnSendPacketToNode_A    ();
     void                    OnSendPacketToNode_B    ();
 
+    void                    TestRadioSerialMonitor  ();
+
     //<! callback for incoming radio data eventa
     void                    OnRadioHub_DataEvent    ( const Dictionary& result ) override;
 
