@@ -23,17 +23,18 @@ void showItem( const Command_t* Commands, uint8_t n ) {
   //show "  ESC: quit" or "  'C': description of the command" 
   uint8_t aKey = Commands[n].aKey;
   if ( ' ' == aKey ) {
-    SerialUSB.print( F("SPACE") );
+    SerialUSB.write( "SPACE" );
   } else if ( 27 == aKey ) {
-    SerialUSB.print( F("  ESC") );
+    SerialUSB.write( "  ESC" );
   } else {
-    SerialUSB.print( F("  \'") );
+    SerialUSB.write( "  \'" );
     //Serial.print( n );
-    SerialUSB.print( char( aKey ) );
-    SerialUSB.print('\'');
+    SerialUSB.write( char( aKey ) );
+    SerialUSB.write('\'');
   }
-  SerialUSB.print( F(": ") );
-  SerialUSB.println( Commands[n].cDescription );
+  SerialUSB.write( ": " );
+  SerialUSB.write( Commands[n].cDescription );
+  SerialUSB.write( "\r\n" );
 }
 
 int16_t findItem( const Command_t* Commands, uint8_t CommandCount, uint8_t aKey ) {

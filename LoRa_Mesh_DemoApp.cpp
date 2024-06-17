@@ -219,7 +219,8 @@ LoRaMesh_DemoApp::OnSendPacketToNode_B( void ) {
 void
 LoRaMesh_DemoApp::TestRadioSerialMonitor( void ) {
     _HMISerial.println( F("Sending ZZZ") );
-    GetSerial().print( F("ZZZ") );
+    GetSerial().write( "ZZZZZ" );
+    _HMISerial.println( F("Done!") );
 }
 
 

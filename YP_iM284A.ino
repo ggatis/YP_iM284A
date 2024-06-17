@@ -54,11 +54,19 @@ void LEDoff( void ) {
   digitalWrite( LED_BUILTIN, HIGH );
 }
 
-void LEDswitch( uint8_t state ) {
+void LEDset( uint8_t state ) {
   if ( state ) {
     LEDon();
   } else {
     LEDoff();
+  }
+}
+
+void LEDtoggle( void ) {
+  if ( HIGH == digitalRead( LED_BUILTIN ) ) {
+    digitalWrite( LED_BUILTIN, LOW );
+  } else {
+    digitalWrite( LED_BUILTIN, HIGH );
   }
 }
 
@@ -70,9 +78,10 @@ void LEDinit( void ) {
 #define ON_time      100
 #define ONOFF_time  1000
 
+static uint8_t  LEDstate = 1;
+
 void LEDhandler( void ) {
   static uint32_t LastSysTick = 0;
-  static uint8_t  LEDstate = 1;
   uint32_t NewSysTick = mySysTick;
   if ( LEDstate ) {
     if ( NewSysTick > ( LastSysTick + ON_time ) ) {
@@ -113,14 +122,25 @@ void _100msCallback( void ) {
 }
 
 
+void serialEvent1() {
+    while ( 0 < Serial1.available() ) {
+        LEDtoggle();
+        char c = Serial1.read();
+    }
+}
+
+
 void serialEvent2() {
     lastS2IOtick = mySysTick;
-    //while ( 0 < Serial2.available() ) {
-    //    //pRaMonBuff->append( (uint8_t)Serial2.read() );
-    //    Serial2.read();
-    //}
-    Serial2.read();
+    while ( 0 < Serial2.available() ) {
+        LEDtoggle();
+        char c = Serial2.read();
+        pRaMonBuff->append( (uint8_t)c );
+        //Serial2.read();
+    }
+    //Serial2.read();
 }
+
 
 ////
 
@@ -163,6 +183,9 @@ void setup( void ) {
   Serial1.begin( 115200 );
   Serial2.begin( 115200 );
 
+  Serial1.write( "Serial1\r\n" );
+  Serial2.write( "Serial2\r\n" );
+  
   pRaMonBuff = new ByteArray( 300 );
   
   pDemoApp = new LoRaMesh_DemoApp( Serial1, SerialUSB );

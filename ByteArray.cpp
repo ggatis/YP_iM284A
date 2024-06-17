@@ -432,7 +432,9 @@ ByteArray::chop( int n ) {
 void
 ByteArray::print( HardwareSerial Serial ) const {
     for ( uint16_t i = 0; i < count(); i++ ) {
-        Serial.print( (char)at( i ) );
+        //non-blocking
+        if ( 0 < Serial.availableForWrite() )
+            Serial.write( (char)at( i ) );
     }
 }
 
@@ -447,6 +449,8 @@ ByteArray::print( HardwareSerial Serial ) const {
 void
 ByteArray::print( USBSerial Serial ) const {
     for ( uint16_t i = 0; i < count(); i++ ) {
-        Serial.print( (char)at( i ) );
+        //non-blocking
+        if ( 0 < Serial.availableForWrite() )
+            Serial.write( (char)at( i ) );
     }
 }
