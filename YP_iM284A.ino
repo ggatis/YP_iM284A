@@ -33,10 +33,10 @@ ByteArray* pRaMonBuff;
 #include "iM284A_L0.h"  //for "print usage"
 
 #include "HardwareSerial.h"
-//HardwareSerial Serial1( PA10, PA9 );
-HardwareSerial Serial1( USART1 );   //Radio
-//HardwareSerial Serial2( USART2 );
-HardwareSerial Serial2( PA3, PA2 ); //monitor
+HardwareSerial Serial1( USART1 );  //Radio
+HardwareSerial Serial2( USART2 );  //monitor
+//HardwareSerial Serial4( USART4 );
+HardwareSerial Serial5( USART5 );
 
 #include "CurrentTime.h"
 
@@ -180,11 +180,28 @@ void setup( void ) {
   MyTim->resume();
 
   //
+  Serial1.setRx( PA10 );
+  Serial1.setTx( PA9 );
   Serial1.begin( 115200 );
+
+  //Serial2.setRx( PA3 );
+  //Serial2.setTx( PA2 );
+  Serial2.setRx( PA_3_ALT1 );
+  Serial2.setTx( PA_2_ALT1 );
   Serial2.begin( 115200 );
+
+  Serial4.setRx( PA1 );
+  Serial4.setTx( PA0 );
+  Serial4.begin( 115200 );
+
+  Serial5.setRx( PB4 );
+  Serial5.setTx( PB3 );
+  Serial5.begin( 115200 );
 
   Serial1.write( "Serial1\r\n" );
   Serial2.write( "Serial2\r\n" );
+  Serial4.write( "Serial4\r\n" );
+  Serial5.write( "Serial5\r\n" );
   
   pRaMonBuff = new ByteArray( 300 );
   
