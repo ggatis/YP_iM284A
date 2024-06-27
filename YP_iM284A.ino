@@ -32,11 +32,11 @@ ByteArray* pRaMonBuff;
 #include "iM284A.h"
 #include "iM284A_L0.h"  //for "print usage"
 
-#include "HardwareSerial.h"
-HardwareSerial Serial1( USART1 );  //Radio
-HardwareSerial Serial2( USART2 );  //monitor
+//#include "HardwareSerial.h"
+//HardwareSerial Serial1( USART1 );  //Radio
+//HardwareSerial Serial2( USART2 );  //monitor
 //HardwareSerial Serial4( USART4 );
-HardwareSerial Serial5( USART5 );
+//HardwareSerial Serial5( USART5 );
 
 #include "CurrentTime.h"
 
@@ -101,7 +101,6 @@ void LEDhandler( void ) {
 /*********************************************************************/
 /*                               Timer                               */
 /*********************************************************************/
-
 void _100msCallback( void ) {
   //10hz
   static uint8_t mSeconds100 = 9;
@@ -122,15 +121,17 @@ void _100msCallback( void ) {
 }
 
 
+/*********************************************************************/
+/*                              Serials                              */
+/*********************************************************************/
 void serialEvent1() {
-    while ( 0 < Serial1.available() ) {
-        LEDtoggle();
-        char c = Serial1.read();
-    }
+    LEDtoggle();
+  
 }
 
 
 void serialEvent2() {
+    LEDtoggle();
     lastS2IOtick = mySysTick;
     while ( 0 < Serial2.available() ) {
         LEDtoggle();
@@ -141,11 +142,23 @@ void serialEvent2() {
     //Serial2.read();
 }
 
+void serialEvent4() {
+    LEDtoggle();
+  
+}
 
-////
+void serialEvent5() {
+    LEDtoggle();
+  
+}
 
+/*********************************************************************/
+/*                               Setup                               */
+/*********************************************************************/
 void setup( void ) {
 
+  pRaMonBuff = new ByteArray( 300 );
+  
   LEDinit();
   
   //Initialize serial and wait for port to open:
@@ -157,7 +170,7 @@ void setup( void ) {
   SerialUSB.println( F("") );
   SerialUSB.println( F("") );
   SerialUSB.println( F("") );
-  SerialUSB.println( F("YP_iM284A.ino: test of iM284A HCI v0.2:") );
+  SerialUSB.println( F("YP_iM284A: test of iM284A HCI v0.2:") );
   
   printUsage();
 
@@ -202,8 +215,6 @@ void setup( void ) {
   Serial2.write( "Serial2\r\n" );
   Serial4.write( "Serial4\r\n" );
   Serial5.write( "Serial5\r\n" );
-  
-  pRaMonBuff = new ByteArray( 300 );
   
   pDemoApp = new LoRaMesh_DemoApp( Serial1, SerialUSB );
   pDemoApp->print();
@@ -263,9 +274,8 @@ void RadioHandler( void ) {
 
 void MonitorHandler( void ) {
     if ( pRaMonBuff->count() ) {
-        if (
-            ( mySysTick >= ( lastS2IOtick + MonitorDelayTicks ) ) ||
-            ( pRaMonBuff->count() > ( pRaMonBuff->size() - 10 ) ) ) {
+        if ( ( mySysTick >= ( lastS2IOtick + MonitorDelayTicks ) ) ||
+             ( pRaMonBuff->count() > ( pRaMonBuff->size() - 10 ) ) ) {
             pRaMonBuff->print( SerialUSB );
         }
     }
