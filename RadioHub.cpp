@@ -46,6 +46,7 @@ RadioHub::Init( void ) {
     _RadioSerial.begin( 115200, SERIAL_8N1 );
     //_Port.setFlowControl( QSerialPort::NoFlowControl );
 
+    //nomest pa 0???
     _SerialInfo.append("Port", "Serial1");
     _SerialInfo.append("Baudrate", "115200 bps");
     _SerialInfo.append("Config", "SERIAL_8N1");
@@ -96,6 +97,7 @@ RadioHub::OnSlipDecoder_MessageReady( const ByteArray& msg ) {
     //HCI message is available in _RxMessage, we can ignore incoming param "msg" here
     //since it points to the same _RxMessage
     printSTDstring( _RxMessage.GetHexString() );
+    //printf( _RxMessage.GetHexString() );
 
     Dictionary result;
 
@@ -103,7 +105,8 @@ RadioHub::OnSlipDecoder_MessageReady( const ByteArray& msg ) {
     if ( ServiceAccessPoint::OnDispatchMessage( _RxMessage, result ) ) {
         _Client.OnRadioHub_DataEvent( result );
     } else {
-        printSTDstring("No dispachers for: ");
+        //printSTDstring("No dispachers for: ");
+        printf("No dispachers for: ");
         printSTDstring( _RxMessage.GetHexString() );
     }
 

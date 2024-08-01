@@ -23,8 +23,8 @@
 //#include <QSerialPort>
 //#include <QJsonObject>
 //#include <QString>
-#include "Dictionary.h"     //also "HardwareSerial.h", "ByteArray.h"
-
+#include "Dictionary.h"     //also "ByteArray.h"
+#include "HardwareSerial.h"
 
 //<! top level interface class for radio module communication
 //class RadioHub : public QObject

@@ -14,6 +14,7 @@
 
 #include "SerialMessage.h"
 #include "Dictionary.h"
+#include "HardwareSerial.h"
 
 //#include <QSerialPort>
 

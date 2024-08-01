@@ -21,9 +21,29 @@ volatile uint8_t  ActiveCommand = 0;
 #include "YP_iM284A.h"
 //#include "Utils/Console.h"
 
-#include "ByteArray.h"
+//#include "HardwareSerial.h"
+//HardwareSerial Serial1( USART1 );  //Radio
+//HardwareSerial Serial2( USART2 );  //monitor
+//HardwareSerial Serial4( USART4 );
+//HardwareSerial Serial5( USART5 );
 
-ByteArray* pRaMonBuff;
+#define REDEFINE_WRITE 1
+#if 0 == REDEFINE_WRITE
+/* Private function prototypes -----------------------------------------------*/
+extern "C" PUTCHAR_PROTOTYPE {
+  HAL_UART_Transmit( SerialUSB.getHandle(), (uint8_t*)&ch, 1, HAL_MAX_DELAY );
+  return ch;
+}
+#else   //0 == REDEFINE_WRITE
+//Override the _write function to use SerialUSB
+extern "C" int _write( int file, char* ptr, int len ) {
+    //Write the character array to SerialUSB
+    return (int)SerialUSB.write( (uint8_t*)ptr, len );
+}
+#endif  //0 == REDEFINE_WRITE
+
+#include "ByteArray.h"
+ByteArray* pRaMonBuff = nullptr;  //serial activity
 
 #include "CRC16.h"
 #include "SlipDecoder.h"
@@ -32,17 +52,14 @@ ByteArray* pRaMonBuff;
 #include "iM284A.h"
 #include "iM284A_L0.h"  //for "print usage"
 
-//#include "HardwareSerial.h"
-//HardwareSerial Serial1( USART1 );  //Radio
-//HardwareSerial Serial2( USART2 );  //monitor
-//HardwareSerial Serial4( USART4 );
-//HardwareSerial Serial5( USART5 );
-
 #include "CurrentTime.h"
 
 #include "LoRa_Mesh_DemoApp.h"
-LoRaMesh_DemoApp* pDemoApp;
+LoRaMesh_DemoApp* pDemoApp = nullptr;
 
+/*********************************************************************/
+/*                               Pins                                */
+/*********************************************************************/
 //LED
 #define LED_BUILTIN   13
 
@@ -75,32 +92,12 @@ void LEDinit( void ) {
   LEDon();
 }
 
-#define ON_time      100
-#define ONOFF_time  1000
-
-static uint8_t  LEDstate = 1;
-
-void LEDhandler( void ) {
-  static uint32_t LastSysTick = 0;
-  uint32_t NewSysTick = mySysTick;
-  if ( LEDstate ) {
-    if ( NewSysTick > ( LastSysTick + ON_time ) ) {
-      LEDstate = 0;
-      LEDoff();
-      LastSysTick = LastSysTick ? LastSysTick + ON_time : NewSysTick;
-    }
-  } else {
-    if ( NewSysTick > ( LastSysTick + ONOFF_time - ON_time  ) ) {
-      LEDstate = 1;
-      LEDon();
-      LastSysTick = LastSysTick + ONOFF_time - ON_time;
-    }
-  }
-}
 
 /*********************************************************************/
 /*                               Timer                               */
 /*********************************************************************/
+HardwareTimer* pMyTim;
+
 void _100msCallback( void ) {
   //10hz
   static uint8_t mSeconds100 = 9;
@@ -126,58 +123,84 @@ void _100msCallback( void ) {
 /*********************************************************************/
 void serialEvent1() {
     LEDtoggle();
-  
+    //SerialUSB.println( F("sEv1") );
+    printf("sEv1\r\n");
 }
 
 
 void serialEvent2() {
     LEDtoggle();
-    lastS2IOtick = mySysTick;
-    while ( 0 < Serial2.available() ) {
-        LEDtoggle();
-        char c = Serial2.read();
-        pRaMonBuff->append( (uint8_t)c );
-        //Serial2.read();
+    //SerialUSB.println( F("sEv2") );
+    printf("sEv2\r\n");
+    if ( pRaMonBuff ) {
+        lastS2IOtick = mySysTick;
+        while ( 0 < Serial2.available() ) {
+            LEDtoggle();
+            pRaMonBuff->append( (uint8_t)Serial2.read() );
+        }
     }
-    //Serial2.read();
 }
 
 void serialEvent4() {
     LEDtoggle();
-  
+    //SerialUSB.println( F("sEv4") );
+    printf("sEv4\r\n");
 }
 
 void serialEvent5() {
     LEDtoggle();
-  
+    //SerialUSB.println( F("sEv5") );
+    printf("sEv5\r\n");
 }
 
 /*********************************************************************/
 /*                               Setup                               */
 /*********************************************************************/
-void setup( void ) {
-
-  pRaMonBuff = new ByteArray( 300 );
-  
+void setupPins( void ) {
   LEDinit();
-  
-  //Initialize serial and wait for port to open:
+}
+
+void setupSerials( void ) {
+  //Serial.end();
   SerialUSB.begin( 115200 );
+  //Initialize serial and wait for port to open:
   while ( !SerialUSB ) {
     ;   //wait for serial port to connect. Needed for native USB port only
   }
   LEDoff();
-  SerialUSB.println( F("") );
-  SerialUSB.println( F("") );
-  SerialUSB.println( F("") );
-  SerialUSB.println( F("YP_iM284A: test of iM284A HCI v0.2:") );
-  
-  printUsage();
+
+  //
+  //Serial1.end();
+  //Serial1.setRx( PA10 );
+  //Serial1.setTx( PA9 );
+  Serial1.begin( 115200 );
+  //Serial1.print( "S1" );
+  printf("S1");
+
+  Serial2.end();
+  //Serial2.setRx( PA3 );
+  //Serial2.setTx( PA2 );
+  Serial2.setRx( PA_3_ALT1 );
+  Serial2.setTx( PA_2_ALT1 );
+  Serial2.begin( 115200 );
+
+  Serial4.end();
+  Serial4.setRx( PA1 );
+  Serial4.setTx( PA0 );
+  Serial4.begin( 115200 );
+
+  Serial5.end();
+  Serial5.setRx( PB4 );
+  Serial5.setTx( PB3 );
+  Serial5.begin( 115200 );
+
+}
+
+void setupTimers( void ) {
 
 #if 0 == _SYSTIME_
   initCurrentTime();
 #endif
-
 #if defined( TIM1 )
   TIM_TypeDef *Instance = TIM1;
 #else
@@ -186,41 +209,45 @@ void setup( void ) {
 
   //Instantiate HardwareTimer object.
   //Thanks to 'new' instanciation, HardwareTimer is not destructed when setup() function is finished.
-  HardwareTimer *MyTim = new HardwareTimer( Instance );
-  MyTim->setMode( 2, TIMER_OUTPUT_COMPARE );
-  MyTim->setOverflow( 10, HERTZ_FORMAT );  //10 Hz
-  MyTim->attachInterrupt( _100msCallback );
-  MyTim->resume();
+  pMyTim = new HardwareTimer( Instance );
+  pMyTim->setMode( 2, TIMER_OUTPUT_COMPARE );
+  pMyTim->setOverflow( 10, HERTZ_FORMAT );  //10 Hz
+  pMyTim->attachInterrupt( _100msCallback );
+  pMyTim->resume();
+}
 
-  //
-  Serial1.setRx( PA10 );
-  Serial1.setTx( PA9 );
-  Serial1.begin( 115200 );
+void setup( void ) {
 
-  //Serial2.setRx( PA3 );
-  //Serial2.setTx( PA2 );
-  Serial2.setRx( PA_3_ALT1 );
-  Serial2.setTx( PA_2_ALT1 );
-  Serial2.begin( 115200 );
-
-  Serial4.setRx( PA1 );
-  Serial4.setTx( PA0 );
-  Serial4.begin( 115200 );
-
-  Serial5.setRx( PB4 );
-  Serial5.setTx( PB3 );
-  Serial5.begin( 115200 );
-
-  Serial1.write( "Serial1\r\n" );
-  Serial2.write( "Serial2\r\n" );
-  Serial4.write( "Serial4\r\n" );
-  Serial5.write( "Serial5\r\n" );
+  pRaMonBuff = new ByteArray( 300 );
   
-  pDemoApp = new LoRaMesh_DemoApp( Serial1, SerialUSB );
+  setupPins();
+  setupSerials();
+  setupTimers();
+  
+  //SerialUSB.println( F("") );
+  printf("\r\n");
+  //SerialUSB.println( F("") );
+  printf("\r\n");
+  //SerialUSB.println( F("") );
+  printf("\r\n");
+  //SerialUSB.println( F("YP_iM284A: test of iM284A HCI v0.2:") );
+  printf("YP_iM284A: test of iM284A HCI v0.2:\r\n");
+  
+  printUsage();
+  Serial1.write("Serial1\r\n");
+  Serial2.write("Serial2\r\n");
+  Serial4.write("Serial4\r\n");
+  Serial5.write("Serial5\r\n");
+  
+  pDemoApp = new LoRaMesh_DemoApp( Serial1 );
   pDemoApp->print();
 
 }
 
+
+/*********************************************************************/
+/*                               Main                                */
+/*********************************************************************/
 #define CommandTimeout  30000
 
 void SerialUSBHandler( void ) {
@@ -229,19 +256,18 @@ void SerialUSBHandler( void ) {
   if ( ActiveCommand ) {
     if ( HAL_GetTick() > ( LastInputAtTick + CommandTimeout ) ) {
       ActiveCommand = 0;    //rollback visam!!!
-      SerialUSB.println(" <- timeout");
+      printf(" <- timeout");
     } else
       return;
   }
   if ( SerialUSB.available() ) {
     uint8_t inChar = (uint8_t)SerialUSB.read();
-    SerialUSB.print( char( inChar ) );
+    printf("%c", inChar );
     if ( '<' == inChar ) inChar = 27;
     ActiveCommand = inChar;
     LastInputAtTick = mySysTick;
   }
 }
-
 
 void CommandHandler( void ) {
   if ( ActiveCommand ) {
@@ -251,14 +277,18 @@ void CommandHandler( void ) {
       ActiveCommand
     );
     if ( -1 == item ) {
-      SerialUSB.println( F(" <- command?") );
+      printf(" <- command?\r\n");
     } else {
       if ( CommandTables[ActiveCommandTable].pCommandTable[item].aFunction ) {
-        SerialUSB.print( F(": ") );
-        SerialUSB.println( CommandTables[ActiveCommandTable].pCommandTable[item].cDescription );
+        //SerialUSB.print( F(": ") );
+        printf(": ");
+        //SerialUSB.println( CommandTables[ActiveCommandTable].pCommandTable[item].cDescription );
+        printf( CommandTables[ActiveCommandTable].pCommandTable[item].cDescription );
+        printf("\r\n");
         CommandTables[ActiveCommandTable].pCommandTable[item].aFunction();
       } else {
-        SerialUSB.println( F(" <- a separator") );
+        //SerialUSB.println( F(" <- a separator") );
+        printf(" <- a separator\r\n");
       }
     }
     ActiveCommand = 0;
@@ -273,13 +303,25 @@ void RadioHandler( void ) {
 #define MonitorDelayTicks 1
 
 void MonitorHandler( void ) {
-    if ( pRaMonBuff->count() ) {
+    if ( ( pRaMonBuff ) && ( pRaMonBuff->count() ) ) {
         if ( ( mySysTick >= ( lastS2IOtick + MonitorDelayTicks ) ) ||
              ( pRaMonBuff->count() > ( pRaMonBuff->size() - 10 ) ) ) {
-            pRaMonBuff->print( SerialUSB );
+            //SerialUSB.print( F("In2:") );
+            printf("In2:");
+            pRaMonBuff->print();
+            pRaMonBuff->clear();
         }
     }
 }
+
+void GetSleep( void ) {
+  //no sleep so far
+  //deepsleep lib
+  //check state
+  //return if action
+  //sleep
+}
+
 
 //SerialUSB: commands from PC
 //Serial1  : iM284A interface
@@ -291,4 +333,13 @@ void loop( void ) {
   CommandHandler();
   RadioHandler();
   MonitorHandler();
+  GetSleep();
+  if ( 0 == ( mySysTick % 1000 ) ) {
+    printf("%d\r\n", pRaMonBuff->count() );
+    Serial1.print('1');
+    Serial2.print('2');
+    Serial4.print('4');
+    Serial5.print('5');
+    delay( 1 );
+  }
 }

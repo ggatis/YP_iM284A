@@ -14,7 +14,9 @@
 //#include <cstddef>          //size_t - kick?
 //#include <string>           //string
 //#include <cstring>          //nullptr
+#include <stdio.h>
 #include "Dictionary.h"
+#include <cstring>
 
 static char snBuffer[20];
 
@@ -187,10 +189,9 @@ skip_endmarking:
 uint16_t
 Dictionary::appendU8( uint8_t n, bool Continue ) {
 
-    const char* format = "%d";
-    snprintf( snBuffer, sizeof( snBuffer ), format, n );
-
+    snprintf( snBuffer, sizeof( snBuffer ), "%d", n );
     return append( (const char*)snBuffer, Continue );
+
 }
 
 
@@ -204,10 +205,10 @@ Dictionary::appendU8( uint8_t n, bool Continue ) {
 uint16_t
 Dictionary::appendU32( uint32_t n, bool Continue ) {
 
-    const char* format = "%d";
-    snprintf( snBuffer, sizeof( snBuffer ), format, n );
-
+    //const char* format = "%d";
+    snprintf( snBuffer, sizeof( snBuffer ), "%d", n );
     return append( (const char*)snBuffer, Continue );
+
 }
 
 
@@ -237,6 +238,7 @@ skip_endmarking2:
     return _ByteArray.count();
 */
     return append( akey, false ) + append( data, false );
+
 }
 
 
@@ -683,7 +685,8 @@ void        Dictionary::clear( void ) {
  *
  * @return  prints the dictionary
  */
-void        Dictionary::print( HardwareSerial Serial ) const {
+//void        Dictionary::print( HardwareSerial Serial ) const {
+void        Dictionary::print( void ) const {
     //key : data
     uint16_t maxsizeofkey = 0;
     uint16_t sizeofkeyi;
@@ -694,14 +697,18 @@ void        Dictionary::print( HardwareSerial Serial ) const {
     }
     for ( i = 0; i < _keys; i++ ) {
         sizeofkeyi = sizeof_key( i );
-        Serial.print( (const char*)key( i ) );
+        //Serial.print( (const char*)key( i ) );
+        printf( (const char*)key( i ) );
         sizeofkeyi = maxsizeofkey - sizeofkeyi;
         sizeofkeyi++;
         while ( sizeofkeyi-- ) {
-            Serial.print(' ');
+            //Serial.print(' ');
+            printf(" ");
         }
-        Serial.print( F(": ") );
-        Serial.println( (const char*)data( i ) );
+        //Serial.print( F(": ") );
+        printf(": ");
+        //Serial.println( (const char*)data( i ) );
+        printf( (const char*)data( i ) );
     }
 }
 
@@ -712,6 +719,7 @@ void        Dictionary::print( HardwareSerial Serial ) const {
  *
  * @return  prints the dictionary
  */
+/*
 void        Dictionary::print( USBSerial Serial ) const {
     //key : data
     uint16_t maxsizeofkey = 0;
@@ -733,6 +741,7 @@ void        Dictionary::print( USBSerial Serial ) const {
         Serial.println( (const char*)data( i ) );
     }
 }
+*/
 
 /**
  * @brief   prints the keys containing records of the dictionary in an elegant way
@@ -741,7 +750,9 @@ void        Dictionary::print( USBSerial Serial ) const {
  *
  * @return  prints the dictionary
  */
-void        Dictionary::print( HardwareSerial Serial, const char* keys[],
+//void        Dictionary::print( HardwareSerial Serial, const char* keys[],
+//                const uint16_t keycount, bool inverse ) const {
+void        Dictionary::print( const char* keys[],
                 const uint16_t keycount, bool inverse ) const {
 
     uint16_t maxsizeofkey = 0;
@@ -778,14 +789,18 @@ SkipThis:
                     goto SkipThisAgain;
             }
 
-            Serial.print( (const char*)testkey );
+            //Serial.print( (const char*)testkey );
+            printf( (const char*)testkey );
 
             sizeofkey = strlen( (const char*)testkey );
             for ( i = sizeofkey; i < maxsizeofkey; i++ )
-                Serial.print(' ');
-            Serial.print( F(" : ") );
+                //Serial.print(' ');
+                printf(" ");
+            //Serial.print( F(" : ") );
+            printf(" : ");
 
-            Serial.println( (const char*)data( i ) );
+            //Serial.println( (const char*)data( i ) );
+            printf( (const char*)data( i ) );
 
 SkipThisAgain:
             ;
@@ -804,17 +819,22 @@ SkipThisAgain:
 
             akey = keys[k];
             sizeofkey = strlen( akey );
-            Serial.print( akey );
+            //Serial.print( akey );
+            printf( akey );
 
             for ( i = sizeofkey; i < maxsizeofkey; i++ )
-                Serial.print(' ');
-            Serial.print( F(" : ") );
+                //Serial.print(' ');
+                printf(" ");
+            //Serial.print( F(" : ") );
+            printf(" : ");
 
             testdata = contains( (const uint8_t*)( akey ) );
             if ( testdata ) {
-                Serial.println( (const char*)( testdata ) );
+                //Serial.println( (const char*)( testdata ) );
+                printf( (const char*)( testdata ) );
             } else {
-                Serial.println();
+                //Serial.println();
+                printf("\r\n");
             }
         }
     }
@@ -827,6 +847,7 @@ SkipThisAgain:
  *
  * @return  prints the dictionary
  */
+/*
 void        Dictionary::print( USBSerial Serial, const char* keys[],
                 const uint16_t keycount, bool inverse ) const {
 
@@ -905,3 +926,4 @@ SkipThisAgain:
         }
     }
 }
+*/

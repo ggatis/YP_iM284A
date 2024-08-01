@@ -13,6 +13,7 @@
 
 #include <cstddef>
 #include <cstring>
+#include <stdio.h>
 #include <algorithm>    //std::min
 #include "ByteArray.h"
 
@@ -430,11 +431,9 @@ ByteArray::chop( int n ) {
  * @return  -
  */
 void
-ByteArray::print( HardwareSerial Serial ) const {
+ByteArray::print( void ) const {
     for ( uint16_t i = 0; i < count(); i++ ) {
-        //non-blocking
-        if ( 0 < Serial.availableForWrite() )
-            Serial.write( (char)at( i ) );
+        printf( "%c", at( i ) );
     }
 }
 
@@ -446,11 +445,11 @@ ByteArray::print( HardwareSerial Serial ) const {
  *
  * @return  -
  */
-void
-ByteArray::print( USBSerial Serial ) const {
-    for ( uint16_t i = 0; i < count(); i++ ) {
-        //non-blocking
-        if ( 0 < Serial.availableForWrite() )
-            Serial.write( (char)at( i ) );
-    }
-}
+//void
+//ByteArray::print( USBSerial Serial ) const {
+//    for ( uint16_t i = 0; i < count(); i++ ) {
+//        //non-blocking
+//        if ( 0 < Serial.availableForWrite() )
+//            Serial.write( (char)at( i ) );
+//    }
+//}

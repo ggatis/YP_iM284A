@@ -14,11 +14,12 @@
 #ifndef _ByteArray_H_
 #define _ByteArray_H_
 
-#include <string>
+#include <string>   //cpp string
 #include <stdint.h>
+#include <stdio.h>  //c printf
 
-#include <USBSerial.h>
-#include "HardwareSerial.h"
+//#include <USBSerial.h>
+//#include "HardwareSerial.h"
 
 
 /**
@@ -236,7 +237,7 @@ class ByteArray {
          *
          * @return  -
          */
-        void        print( HardwareSerial Serial ) const;
+        void        print( void ) const;
 
         /**
          * @brief   prints the buffer ar chars
@@ -245,7 +246,7 @@ class ByteArray {
          *
          * @return  -
          */
-        void        print( USBSerial Serial ) const;
+//        void        print( USBSerial Serial ) const;
 
     private:
         //<! size

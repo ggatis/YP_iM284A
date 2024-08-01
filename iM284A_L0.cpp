@@ -12,7 +12,7 @@
  */
 
 #include <stdint.h>
-#include <Arduino.h>
+//#include <Arduino.h>
 
 #include "iM284A.h"
 #include "iM284A_L0.h"
@@ -91,7 +91,8 @@ void printUsage( void ) {
 }
 
 void quitDemo( void ) {
-    SerialUSB.println( F("Quit?") );
+    //SerialUSB.println( F("Quit?") );
+    printf("Quit?");
     pDemoApp->OnExit();
 }
 
@@ -99,42 +100,50 @@ void quitDemo( void ) {
 /*** Device Management Services ***/
 
 void PingDevice( void ) {
-    SerialUSB.println( F("PingDevice") );
+    //SerialUSB.println( F("PingDevice") );
+    printf("PingDevice");
     pDemoApp->OnPingDevice();
 }
 
 void GetDeviceInformation( void ) {
-    SerialUSB.println( F("GetDeviceInformation") );
+    //SerialUSB.println( F("GetDeviceInformation") );
+    printf("GetDeviceInformation");
     pDemoApp->OnGetDeviceInformation();
 }
 
 void GetFirmwareVersion( void ) {
-    SerialUSB.println( F("GetFirmwareVersion") );
+    //SerialUSB.println( F("GetFirmwareVersion") );
+    printf("GetFirmwareVersion");
     pDemoApp->OnGetFirmwareVersion();
 }
 
 void GetDateTime( void ) {
-    SerialUSB.println( F("GetDateTime") );
+    //SerialUSB.println( F("GetDateTime") );
+    printf("GetDateTime");
     pDemoApp->OnGetDateTime();
 }
 
 void SetDateTime( void ) {
-    SerialUSB.println( F("SetDateTime") );
+    //SerialUSB.println( F("SetDateTime") );
+    printf("SetDateTime");
     pDemoApp->OnSetDateTime();
 }
 
 void RestartDevice( void ) {
-    SerialUSB.println( F("RestartDevice") );
+    //SerialUSB.println( F("RestartDevice") );
+    printf("RestartDevice");
     pDemoApp->OnRestartDevice();
 }
 
 void GetSystemOptions( void ) {
-    SerialUSB.println( F("GetSystemOptions") );
+    //SerialUSB.println( F("GetSystemOptions") );
+    printf("GetSystemOptions");
     pDemoApp->OnGetSystemOptions();
 }
 
 void SetSystemOptions( void ) {
-    SerialUSB.println( F("SetSystemOptions") );
+    //SerialUSB.println( F("SetSystemOptions") );
+    printf("SetSystemOptions");
     pDemoApp->OnGetSystemOptions();
 }
 
@@ -142,57 +151,68 @@ void SetSystemOptions( void ) {
 /*** LoRa Mesh Router ***/
 
 void GetNetworkAddress( void ) {
-    SerialUSB.println( F("GetNetworkAddress") );
+    //SerialUSB.println( F("GetNetworkAddress") );
+    printf("GetNetworkAddress");
     pDemoApp->OnGetNetworkAddress();
 }
 
 void SetNetworkAddress_A( void ) {
-    SerialUSB.println( F("SetNetworkAddress_A") );
+    //SerialUSB.println( F("SetNetworkAddress_A") );
+    printf("SetNetworkAddress_A");
     pDemoApp->OnSetNetworkAddress_A();
 }
 
 void SetNetworkAddress_B( void ) {
-    SerialUSB.println( F("SetNetworkAddress_B") );
+    //SerialUSB.println( F("SetNetworkAddress_B") );
+    printf("SetNetworkAddress_B");
     pDemoApp->OnSetNetworkAddress_B();
 }
 
 void GetMode( void ) {
-    SerialUSB.println( F("GetMode") );
+    //SerialUSB.println( F("GetMode") );
+    printf("GetMode");
     pDemoApp->OnGetMode();
 }
 
 void DisableRouter( void ) {
-    SerialUSB.println( F("DisableRouter") );
+    //SerialUSB.println( F("DisableRouter") );
+    printf("DisableRouter");
     pDemoApp->OnDisableRouter();
 }
 
 void EnableRouter( void ) {
-    SerialUSB.println( F("EnableRouter") );
+    //SerialUSB.println( F("EnableRouter") );
+    printf("EnableRouter");
     pDemoApp->OnEnableRouter();
 }
 
 void EnableCoordinator( void ) {
-    SerialUSB.println( F("EnableCoordinator") );
+    //SerialUSB.println( F("EnableCoordinator") );
+    printf("EnableCoordinator");
     pDemoApp->OnEnableCoordinator();
 }
 
 void GetLinkStatus( void ) {
-    SerialUSB.println( F("GetLinkStatus") );
+    //SerialUSB.println( F("GetLinkStatus") );
+    printf("GetLinkStatus");
     pDemoApp->OnGetLinkStatus();
 }
 
 void GetRoutingInfo( void ) {
-    SerialUSB.println( F("GetRoutingInfo") );
+    //SerialUSB.println( F("GetRoutingInfo") );
+    printf("GetRoutingInfo");
     pDemoApp->OnGetRoutingInfo();
 }
 
 void SendPacketToNode_A( void ) {
-    SerialUSB.println( F("SendPacketToNode_A") );
+    //SerialUSB.println( F("SendPacketToNode_A") );
+    printf("SendPacketToNode_A");
     pDemoApp->OnSendPacketToNode_A();
 }
 
 void SendPacketToNode_B( void ) {
-    SerialUSB.println( F("SendPacketToNode_B") );
+    //SerialUSB.println( F("SendPacketToNode_B") );
+    printf("SendPacketToNode_B");
     pDemoApp->OnSendPacketToNode_B();
 }
 
@@ -204,6 +224,7 @@ void printDemo( void ) {
 }
 
 void testRadioSerialMonitor( void ) {
-    SerialUSB.println( F("testRadioSerialMonitor") );
+    //SerialUSB.println( F("testRadioSerialMonitor") );
+    printf("testRadioSerialMonitor");
     pDemoApp->TestRadioSerialMonitor();
 }

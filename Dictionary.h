@@ -255,7 +255,8 @@ class Dictionary {
          *
          * @return  prints the dictionary
          */
-        void        print( HardwareSerial Serial ) const;
+        void        print( void ) const;
+//        void        print( HardwareSerial Serial ) const;
 
         /**
          * @brief   prints the dictionary in an elegant way
@@ -264,7 +265,7 @@ class Dictionary {
          *
          * @return  prints the dictionary
          */
-        void        print( USBSerial Serial ) const;
+//        void        print( USBSerial Serial ) const;
 
         /**
          * @brief   prints the keys containing records of the dictionary in an elegant way
@@ -273,7 +274,9 @@ class Dictionary {
          *
          * @return  prints the dictionary
          */
-        void        print( HardwareSerial Serial, const char* keys[],
+//        void        print( HardwareSerial Serial, const char* keys[],
+//                        const uint16_t keycount, bool inverse = false ) const;
+        void        print( const char* keys[],
                         const uint16_t keycount, bool inverse = false ) const;
 
         /**
@@ -283,8 +286,8 @@ class Dictionary {
          *
          * @return  prints the dictionary
          */
-        void        print( USBSerial Serial, const char* keys[],
-                        const uint16_t keycount, bool inverse = false ) const;
+//        void        print( USBSerial Serial, const char* keys[],
+//                        const uint16_t keycount, bool inverse = false ) const;
 
     private:
         //<! ByteArray

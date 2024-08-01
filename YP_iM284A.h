@@ -15,4 +15,28 @@
 #ifndef _YP_iM284A_h_
 #define _YP_iM284A_h_
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+//for FILE and I/O definitions
+#include <stdio.h>
+
+//C function declarations
+
+/* Private function prototypes -----------------------------------------------*/
+#ifdef __GNUC__
+  /* With GCC, small printf (option LD Linker->Libraries->Small printf
+     set to 'Yes') calls __io_putchar() */
+  #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#else
+  #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#endif /* __GNUC__ */
+
+#ifdef __cplusplus
+}
+#endif
+
+
 #endif // _YP_iM284A_h_

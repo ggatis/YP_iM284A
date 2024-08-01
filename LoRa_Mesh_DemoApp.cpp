@@ -11,6 +11,7 @@
 
 #include "Dictionary.h"
 #include "LoRa_Mesh_DemoApp.h"
+#include "HardwareSerial.h"
 //#include "Utils/Console.h"
 
 //#include <QCoreApplication>
@@ -21,10 +22,11 @@
  * @param   console     reference to a console
  */
 
-LoRaMesh_DemoApp::LoRaMesh_DemoApp( HardwareSerial& RadioSerial, USBSerial& HMISerial ) :
+//LoRaMesh_DemoApp::LoRaMesh_DemoApp( HardwareSerial& RadioSerial, USBSerial& HMISerial ) :
+LoRaMesh_DemoApp::LoRaMesh_DemoApp( HardwareSerial& RadioSerial ) :
     RadioHub            ( *this, RadioSerial ),
     //QString             _PortName;
-    _HMISerial          ( HMISerial ),
+    //_HMISerial          ( HMISerial ),
     _Network_ID         ( (char*)"00-2A" ),
     _DeviceEUI_Node_A   ( (char*)"01-aa-aa-aa-02-aa-aa-aa" ),
     _DeviceEUI_Node_B   ( (char*)"03-bb-bb-bb-04-bb-bb-bb" ),
@@ -32,11 +34,11 @@ LoRaMesh_DemoApp::LoRaMesh_DemoApp( HardwareSerial& RadioSerial, USBSerial& HMIS
     _Payload_for_Node_A ( (char*)"AA-01-02-02-04-05-06-07-08-AA" ),
     _Payload_for_Node_B ( (char*)"BB-01-02-02-04-05-06-07-08-09-0A-0B-0C-0D-0E-0F-BB" ) {
 
-    _HMISerial.println( "\r\nThis application demonstrates the host controller message protocol for WiMOD radio modules provided by IMST." );
-    _HMISerial.println( "Please connect a WiMOD radio module or WiMOD USB Stick." );
-    _HMISerial.println( "OOpsy - it's too late for this already. Connect it and restart the microcontroller if needed!" );
-    _HMISerial.println( "Don't forget to install the required USB to UART Bridge driver." );
-    _HMISerial.println( "Actually if you are reading this then don't worry about that driver!\r\n" );
+    printf("\r\nThis application demonstrates the host controller message protocol for WiMOD radio modules provided by IMST.\r\n");
+    printf("Please connect a WiMOD radio module or WiMOD USB Stick.\r\n");
+    printf("OOpsy - it's too late for this already. Connect it and restart the microcontroller if needed!\r\n");
+    printf("Don't forget to install the required USB to UART Bridge driver.\r\n");
+    printf("Actually if you are reading this then don't worry about that driver!\r\n\r\n");
 
 }
 
@@ -50,7 +52,7 @@ LoRaMesh_DemoApp::print( void ) {
     DemoInfo.append( "User_Port",           "21" );
     DemoInfo.append( "Payload_for_Node_A",  _Payload_for_Node_A );
     DemoInfo.append( "Payload_for_Node_B",  _Payload_for_Node_B );
-    DemoInfo.print( _HMISerial );
+    DemoInfo.print();
 }
 
 
@@ -59,7 +61,7 @@ LoRaMesh_DemoApp::print( void ) {
  */
 void
 LoRaMesh_DemoApp::OnExit( void ) {
-    _HMISerial.println( F("Seriously?") );
+    printf("Seriously?\r\n");
     //QCoreApplication::quit();
 }
 
@@ -154,8 +156,7 @@ LoRaMesh_DemoApp::OnDisableRouter( void ) {
 }
 
 void
-LoRaMesh_DemoApp::OnEnableRouter( void )
-{
+LoRaMesh_DemoApp::OnEnableRouter( void ) {
     //QJsonObject params;
 
     //params[ "Mode" ]  = "Router";
@@ -164,8 +165,7 @@ LoRaMesh_DemoApp::OnEnableRouter( void )
 }
 
 void
-LoRaMesh_DemoApp::OnEnableCoordinator( void )
-{
+LoRaMesh_DemoApp::OnEnableCoordinator( void ) {
     //QJsonObject params;
 
     //params[ "Mode" ]  = "Coordinator";
@@ -174,14 +174,12 @@ LoRaMesh_DemoApp::OnEnableCoordinator( void )
 }
 
 void
-LoRaMesh_DemoApp::OnGetLinkStatus( void )
-{
+LoRaMesh_DemoApp::OnGetLinkStatus( void ) {
     //_RadioHub.GetLoRaMeshRouter().OnGetLinkStatus();
 }
 
 void
-LoRaMesh_DemoApp::OnGetRoutingInfo( void )
-{
+LoRaMesh_DemoApp::OnGetRoutingInfo( void ) {
     //QJsonObject params;
 
     //// start index
@@ -194,8 +192,7 @@ LoRaMesh_DemoApp::OnGetRoutingInfo( void )
 }
 
 void
-LoRaMesh_DemoApp::OnSendPacketToNode_A( void )
-{
+LoRaMesh_DemoApp::OnSendPacketToNode_A( void ) {
     //QJsonObject params;
 
     //params[ "Destination-EUI" ] = _DeviceEUI_Node_A;
@@ -218,9 +215,10 @@ LoRaMesh_DemoApp::OnSendPacketToNode_B( void ) {
 
 void
 LoRaMesh_DemoApp::TestRadioSerialMonitor( void ) {
-    _HMISerial.println( F("Sending ZZZ") );
-    GetSerial().write( "ZZZZZ" );
-    _HMISerial.println( F("Done!") );
+    printf("Sending ZZZ\r\n");
+    GetSerial().write("ZZZZZ");
+    //Serial1.write("YYYYY");
+    printf("Done!\r\n");
 }
 
 
@@ -238,7 +236,7 @@ void
 LoRaMesh_DemoApp::OnRadioHub_DataEvent( const Dictionary& result ) {
 
     //debug-vvv
-    _HMISerial.println( F("LoRaMesh_DemoApp::OnRadioHub_DataEvent") );
+    printf("LoRaMesh_DemoApp::OnRadioHub_DataEvent\r\n");
     //debug-^^^
 
     const char* key0 = "Event";
@@ -255,19 +253,22 @@ LoRaMesh_DemoApp::OnRadioHub_DataEvent( const Dictionary& result ) {
         const uint8_t*  keydata = data.contains( (const uint8_t*)key );
 
         if ( keydata ) {
-            _HMISerial.print( key );
-            _HMISerial.print( " : " );
-            _HMISerial.print( (const char*)keydata );
+            //_HMISerial.print( key );
+            printf( key );
+            //_HMISerial.print( " : " );
+            printf(" : ");
+            //_HMISerial.print( (const char*)keydata );
+            printf( (const char*)keydata );
             data.remove( (const uint8_t*)key );
         }
     }
-    data.print( _HMISerial );
-    _HMISerial.println();
+    data.print();
+    printf("\r\n");
 
 #else
     //B
-    result.print( _HMISerial, keys, ( sizeof( keys ) / sizeof( keys[0] ) ) );
-    result.print( _HMISerial, keys, ( sizeof( keys ) / sizeof( keys[0] ) ), true );
+    result.print( keys, ( sizeof( keys ) / sizeof( keys[0] ) ) );
+    result.print( keys, ( sizeof( keys ) / sizeof( keys[0] ) ), true );
 
 #endif
 }

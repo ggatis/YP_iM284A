@@ -13,7 +13,7 @@
 #define _LoRa_Mesh_DemoApp_H_
 
 
-#include "Dictionary.h"     //also "HardwareSerial.h", "USBSerial.h", "ByteArray.h"
+#include "Dictionary.h"     //also "ByteArray.h"
 
 //#include "Utils/Console.h"
 #include "RadioHub.h"
@@ -27,8 +27,9 @@
 class LoRaMesh_DemoApp : public RadioHub, public RadioHub::Client {
 //class LoRaMesh_DemoApp {
 public:
-    //                       LoRaMesh_DemoApp         ( Console& console );
-                            LoRaMesh_DemoApp        ( HardwareSerial& RadioSerial, USBSerial& HMISerial );
+    //                        LoRaMesh_DemoApp         ( Console& console );
+    //                        LoRaMesh_DemoApp        ( HardwareSerial& RadioSerial, USBSerial& HMISerial );
+                            LoRaMesh_DemoApp        ( HardwareSerial& RadioSerial );
 
 private:
 
@@ -57,7 +58,7 @@ private:
     //<! name of used serial port
     //QString                 _PortName;
     //HardwareSerial&         _RadioSerial;
-    USBSerial&              _HMISerial;
+    //USBSerial&              _HMISerial;
 
     //<! some application parameters
     char*                   _Network_ID;

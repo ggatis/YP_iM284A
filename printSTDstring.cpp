@@ -12,7 +12,7 @@
  */
 
 #include "printSTDstring.h"
-#include <Arduino.h>
+//#include <Arduino.h>
 
 /**
  * @brief   
@@ -22,6 +22,7 @@
  */
 void printSTDstring( const std::string& aString ) {
     for ( uint16_t i = 0; i < aString.size(); ++i ) {
-        SerialUSB.print( aString[i] );
+        //SerialUSB.print( aString[i] );
+        printf( "%c", aString[i] );
     }
 }
